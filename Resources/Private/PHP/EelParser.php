@@ -1,11 +1,28 @@
 <?php
-// $ANTLR 3.1.3 “ˆŽ 06, 2009 18:28:01 Resources/Private/Grammar/Eel.g 2012-01-23 00:01:18
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 Resources/Private/Grammar/Eel.g 2012-01-23 12:32:16
 
 
-# for convenience in actions
-if (!defined('HIDDEN')) define('HIDDEN', BaseRecognizer::$HIDDEN);
+use Antlr\Runtime\IntStream;
+use Antlr\Runtime\DFA;
+use Antlr\Runtime\Parser;
+use Antlr\Runtime\Lexer;
+use Antlr\Runtime\CommonToken;
+use Antlr\Runtime\Set;
+use Antlr\Runtime\Token;
+use Antlr\Runtime\CharStream;
+use Antlr\Runtime\RecognizerSharedState;
+use Antlr\Runtime\ParserRuleReturnScope;
 
-class EelParser extends AntlrParser {
+use Antlr\Runtime\EarlyExitException;
+use Antlr\Runtime\FailedPredicateException;
+use Antlr\Runtime\MismatchedRangeException;
+use Antlr\Runtime\MismatchedSetException;
+use Antlr\Runtime\MismatchedTokenException;
+use Antlr\Runtime\NoViableAltException;
+use Antlr\Runtime\RecognitionException;
+use Antlr\Runtime\UnwantedtokenException;
+
+class EelParser extends Parser {
     public static $tokenNames = array(
         "<invalid>", "<EOR>", "<DOWN>", "<UP>", "ID", "NUMBER_OP", "BOOLEAN_OP", "COMP_OP", "INT", "FLOAT", "StringLiteral", "PATH_SEP", "EXPONENT", "WS", "DoubleStringCharacter", "SingleStringCharacter", "EscapeSequence", "CharacterEscapeSequence", "HexEscapeSequence", "UnicodeEscapeSequence", "SingleEscapeCharacter", "NonEscapeCharacter", "EscapeCharacter", "HEX_DIGIT", "'('", "')'", "'!'", "':'", "','"
     );
@@ -39,62 +56,60 @@ class EelParser extends AntlrParser {
     // delegates
     // delegators
 
-    
-    static $FOLLOW_expression_in_fullExpression24;
-    static $FOLLOW_EOF_in_fullExpression26;
-    static $FOLLOW_methodCall_in_expression35;
-    static $FOLLOW_compositeExpression_in_expression39;
-    static $FOLLOW_notExpression_in_expression43;
-    static $FOLLOW_term_in_expression47;
-    static $FOLLOW_24_in_wrappedComposite56;
-    static $FOLLOW_expression_in_wrappedComposite58;
-    static $FOLLOW_25_in_wrappedComposite60;
-    static $FOLLOW_wrappedComposite_in_compositeExpression70;
-    static $FOLLOW_term_in_compositeExpression74;
-    static $FOLLOW_numberOperator_in_compositeExpression78;
-    static $FOLLOW_booleanOperator_in_compositeExpression82;
-    static $FOLLOW_comparisonOperator_in_compositeExpression86;
-    static $FOLLOW_wrappedComposite_in_compositeExpression90;
-    static $FOLLOW_term_in_compositeExpression94;
-    static $FOLLOW_26_in_notExpression104;
-    static $FOLLOW_expression_in_notExpression106;
-    static $FOLLOW_methodIdentifier_in_methodCall115;
-    static $FOLLOW_arguments_in_methodCall117;
-    static $FOLLOW_ID_in_methodIdentifier126;
-    static $FOLLOW_27_in_methodIdentifier129;
-    static $FOLLOW_ID_in_methodIdentifier131;
-    static $FOLLOW_24_in_arguments142;
-    static $FOLLOW_expression_in_arguments145;
-    static $FOLLOW_28_in_arguments148;
-    static $FOLLOW_expression_in_arguments150;
-    static $FOLLOW_25_in_arguments157;
-    static $FOLLOW_integerLiteral_in_term165;
-    static $FOLLOW_floatLiteral_in_term169;
-    static $FOLLOW_stringLiteral_in_term173;
-    static $FOLLOW_objectPath_in_term177;
-    static $FOLLOW_NUMBER_OP_in_numberOperator184;
-    static $FOLLOW_BOOLEAN_OP_in_booleanOperator193;
-    static $FOLLOW_COMP_OP_in_comparisonOperator202;
-    static $FOLLOW_INT_in_integerLiteral211;
-    static $FOLLOW_FLOAT_in_floatLiteral220;
-    static $FOLLOW_StringLiteral_in_stringLiteral229;
-    static $FOLLOW_ID_in_objectPath236;
-    static $FOLLOW_PATH_SEP_in_objectPath239;
-    static $FOLLOW_ID_in_objectPath241;
 
-    
+    static public $FOLLOW_expression_in_fullExpression24 = array();
+    static public $FOLLOW_EOF_in_fullExpression26 = array(1 => 1);
+    static public $FOLLOW_methodCall_in_expression35 = array(1 => 1);
+    static public $FOLLOW_compositeExpression_in_expression39 = array(1 => 1);
+    static public $FOLLOW_notExpression_in_expression43 = array(1 => 1);
+    static public $FOLLOW_term_in_expression47 = array(1 => 1);
+    static public $FOLLOW_24_in_wrappedComposite56 = array(4 => 4, 8 => 8, 9 => 9, 10 => 10, 24 => 24, 26 => 26);
+    static public $FOLLOW_expression_in_wrappedComposite58 = array(25 => 25);
+    static public $FOLLOW_25_in_wrappedComposite60 = array(1 => 1);
+    static public $FOLLOW_wrappedComposite_in_compositeExpression70 = array(5 => 5, 6 => 6, 7 => 7);
+    static public $FOLLOW_term_in_compositeExpression74 = array(5 => 5, 6 => 6, 7 => 7);
+    static public $FOLLOW_numberOperator_in_compositeExpression78 = array(4 => 4, 8 => 8, 9 => 9, 10 => 10, 24 => 24);
+    static public $FOLLOW_booleanOperator_in_compositeExpression82 = array(4 => 4, 8 => 8, 9 => 9, 10 => 10, 24 => 24);
+    static public $FOLLOW_comparisonOperator_in_compositeExpression86 = array(4 => 4, 8 => 8, 9 => 9, 10 => 10, 24 => 24);
+    static public $FOLLOW_wrappedComposite_in_compositeExpression90 = array(1 => 1);
+    static public $FOLLOW_term_in_compositeExpression94 = array(1 => 1);
+    static public $FOLLOW_26_in_notExpression104 = array(4 => 4, 8 => 8, 9 => 9, 10 => 10, 24 => 24, 26 => 26);
+    static public $FOLLOW_expression_in_notExpression106 = array(1 => 1);
+    static public $FOLLOW_methodIdentifier_in_methodCall115 = array(24 => 24);
+    static public $FOLLOW_arguments_in_methodCall117 = array(1 => 1);
+    static public $FOLLOW_ID_in_methodIdentifier126 = array(1 => 1, 27 => 27);
+    static public $FOLLOW_27_in_methodIdentifier129 = array(4 => 4);
+    static public $FOLLOW_ID_in_methodIdentifier131 = array(1 => 1);
+    static public $FOLLOW_24_in_arguments142 = array(4 => 4, 8 => 8, 9 => 9, 10 => 10, 24 => 24, 25 => 25, 26 => 26);
+    static public $FOLLOW_expression_in_arguments145 = array(25 => 25, 28 => 28);
+    static public $FOLLOW_28_in_arguments148 = array(4 => 4, 8 => 8, 9 => 9, 10 => 10, 24 => 24, 26 => 26);
+    static public $FOLLOW_expression_in_arguments150 = array(25 => 25, 28 => 28);
+    static public $FOLLOW_25_in_arguments157 = array(1 => 1);
+    static public $FOLLOW_integerLiteral_in_term165 = array(1 => 1);
+    static public $FOLLOW_floatLiteral_in_term169 = array(1 => 1);
+    static public $FOLLOW_stringLiteral_in_term173 = array(1 => 1);
+    static public $FOLLOW_objectPath_in_term177 = array(1 => 1);
+    static public $FOLLOW_NUMBER_OP_in_numberOperator184 = array(1 => 1);
+    static public $FOLLOW_BOOLEAN_OP_in_booleanOperator193 = array(1 => 1);
+    static public $FOLLOW_COMP_OP_in_comparisonOperator202 = array(1 => 1);
+    static public $FOLLOW_INT_in_integerLiteral211 = array(1 => 1);
+    static public $FOLLOW_FLOAT_in_floatLiteral220 = array(1 => 1);
+    static public $FOLLOW_StringLiteral_in_stringLiteral229 = array(1 => 1);
+    static public $FOLLOW_ID_in_objectPath236 = array(1 => 1, 11 => 11);
+    static public $FOLLOW_PATH_SEP_in_objectPath239 = array(4 => 4);
+    static public $FOLLOW_ID_in_objectPath241 = array(1 => 1, 11 => 11);
+
+
     protected $dfa1;
-    
+
 
         public function __construct($input, $state = null) {
             if($state==null){
                 $state = new RecognizerSharedState();
             }
             parent::__construct($input, $state);
-             
-            
+
             $this->dfa1 = new EelParser_DFA1($this);
-            
         }
         
 
@@ -104,11 +119,11 @@ class EelParser extends AntlrParser {
 
 
     // $ANTLR start "fullExpression"
-    // Resources/Private/Grammar/Eel.g:7:1: fullExpression : expression EOF ; 
+    // Resources/Private/Grammar/Eel.g
     public function fullExpression(){
         try {
-            // Resources/Private/Grammar/Eel.g:8:2: ( expression EOF ) 
-            // Resources/Private/Grammar/Eel.g:8:4: expression EOF 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->pushFollow(self::$FOLLOW_expression_in_fullExpression24);
             $this->expression();
@@ -127,22 +142,22 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "fullExpression"
 
 
     // $ANTLR start "expression"
-    // Resources/Private/Grammar/Eel.g:10:1: expression : ( methodCall | compositeExpression | notExpression | term ); 
+    // Resources/Private/Grammar/Eel.g
     public function expression(){
         try {
-            // Resources/Private/Grammar/Eel.g:11:2: ( methodCall | compositeExpression | notExpression | term ) 
+            // Resources/Private/Grammar/Eel.g
             $alt1=4;
             $alt1 = $this->dfa1->predict($this->input);
             switch ($alt1) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:11:4: methodCall 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_methodCall_in_expression35);
                     $this->methodCall();
@@ -153,7 +168,7 @@ class EelParser extends AntlrParser {
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:11:17: compositeExpression 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_compositeExpression_in_expression39);
                     $this->compositeExpression();
@@ -164,7 +179,7 @@ class EelParser extends AntlrParser {
                     }
                     break;
                 case 3 :
-                    // Resources/Private/Grammar/Eel.g:11:39: notExpression 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_notExpression_in_expression43);
                     $this->notExpression();
@@ -175,7 +190,7 @@ class EelParser extends AntlrParser {
                     }
                     break;
                 case 4 :
-                    // Resources/Private/Grammar/Eel.g:11:55: term 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_term_in_expression47);
                     $this->term();
@@ -195,18 +210,18 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "expression"
 
 
     // $ANTLR start "wrappedComposite"
-    // Resources/Private/Grammar/Eel.g:13:1: wrappedComposite : '(' expression ')' ; 
+    // Resources/Private/Grammar/Eel.g
     public function wrappedComposite(){
         try {
-            // Resources/Private/Grammar/Eel.g:14:2: ( '(' expression ')' ) 
-            // Resources/Private/Grammar/Eel.g:14:4: '(' expression ')' 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->match($this->input,$this->getToken('24'),self::$FOLLOW_24_in_wrappedComposite56); 
             $this->pushFollow(self::$FOLLOW_expression_in_wrappedComposite58);
@@ -226,20 +241,20 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "wrappedComposite"
 
 
     // $ANTLR start "compositeExpression"
-    // Resources/Private/Grammar/Eel.g:16:1: compositeExpression : ( wrappedComposite | term ) ( numberOperator | booleanOperator | comparisonOperator ) ( wrappedComposite | term ) ; 
+    // Resources/Private/Grammar/Eel.g
     public function compositeExpression(){
         try {
-            // Resources/Private/Grammar/Eel.g:17:2: ( ( wrappedComposite | term ) ( numberOperator | booleanOperator | comparisonOperator ) ( wrappedComposite | term ) ) 
-            // Resources/Private/Grammar/Eel.g:17:4: ( wrappedComposite | term ) ( numberOperator | booleanOperator | comparisonOperator ) ( wrappedComposite | term ) 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
-            // Resources/Private/Grammar/Eel.g:17:4: ( wrappedComposite | term ) 
+            // Resources/Private/Grammar/Eel.g
             $alt2=2;
             $LA2_0 = $this->input->LA(1);
 
@@ -256,7 +271,7 @@ class EelParser extends AntlrParser {
             }
             switch ($alt2) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:17:5: wrappedComposite 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_wrappedComposite_in_compositeExpression70);
                     $this->wrappedComposite();
@@ -267,7 +282,7 @@ class EelParser extends AntlrParser {
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:17:24: term 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_term_in_compositeExpression74);
                     $this->term();
@@ -280,7 +295,7 @@ class EelParser extends AntlrParser {
 
             }
 
-            // Resources/Private/Grammar/Eel.g:17:30: ( numberOperator | booleanOperator | comparisonOperator ) 
+            // Resources/Private/Grammar/Eel.g
             $alt3=3;
             $LA3 = $this->input->LA(1);
             if($this->getToken('NUMBER_OP')== $LA3)
@@ -304,7 +319,7 @@ class EelParser extends AntlrParser {
 
             switch ($alt3) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:17:31: numberOperator 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_numberOperator_in_compositeExpression78);
                     $this->numberOperator();
@@ -315,7 +330,7 @@ class EelParser extends AntlrParser {
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:17:48: booleanOperator 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_booleanOperator_in_compositeExpression82);
                     $this->booleanOperator();
@@ -326,7 +341,7 @@ class EelParser extends AntlrParser {
                     }
                     break;
                 case 3 :
-                    // Resources/Private/Grammar/Eel.g:17:66: comparisonOperator 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_comparisonOperator_in_compositeExpression86);
                     $this->comparisonOperator();
@@ -339,7 +354,7 @@ class EelParser extends AntlrParser {
 
             }
 
-            // Resources/Private/Grammar/Eel.g:17:86: ( wrappedComposite | term ) 
+            // Resources/Private/Grammar/Eel.g
             $alt4=2;
             $LA4_0 = $this->input->LA(1);
 
@@ -356,7 +371,7 @@ class EelParser extends AntlrParser {
             }
             switch ($alt4) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:17:87: wrappedComposite 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_wrappedComposite_in_compositeExpression90);
                     $this->wrappedComposite();
@@ -367,7 +382,7 @@ class EelParser extends AntlrParser {
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:17:106: term 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_term_in_compositeExpression94);
                     $this->term();
@@ -391,18 +406,18 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "compositeExpression"
 
 
     // $ANTLR start "notExpression"
-    // Resources/Private/Grammar/Eel.g:19:1: notExpression : '!' expression ; 
+    // Resources/Private/Grammar/Eel.g
     public function notExpression(){
         try {
-            // Resources/Private/Grammar/Eel.g:20:2: ( '!' expression ) 
-            // Resources/Private/Grammar/Eel.g:20:4: '!' expression 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->match($this->input,$this->getToken('26'),self::$FOLLOW_26_in_notExpression104); 
             $this->pushFollow(self::$FOLLOW_expression_in_notExpression106);
@@ -421,18 +436,18 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "notExpression"
 
 
     // $ANTLR start "methodCall"
-    // Resources/Private/Grammar/Eel.g:22:1: methodCall : methodIdentifier arguments ; 
+    // Resources/Private/Grammar/Eel.g
     public function methodCall(){
         try {
-            // Resources/Private/Grammar/Eel.g:23:2: ( methodIdentifier arguments ) 
-            // Resources/Private/Grammar/Eel.g:23:4: methodIdentifier arguments 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->pushFollow(self::$FOLLOW_methodIdentifier_in_methodCall115);
             $this->methodIdentifier();
@@ -455,21 +470,21 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "methodCall"
 
 
     // $ANTLR start "methodIdentifier"
-    // Resources/Private/Grammar/Eel.g:25:1: methodIdentifier : ID ( ':' ID )? ; 
+    // Resources/Private/Grammar/Eel.g
     public function methodIdentifier(){
         try {
-            // Resources/Private/Grammar/Eel.g:26:2: ( ID ( ':' ID )? ) 
-            // Resources/Private/Grammar/Eel.g:26:4: ID ( ':' ID )? 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->match($this->input,$this->getToken('ID'),self::$FOLLOW_ID_in_methodIdentifier126); 
-            // Resources/Private/Grammar/Eel.g:26:7: ( ':' ID )? 
+            // Resources/Private/Grammar/Eel.g
             $alt5=2;
             $LA5_0 = $this->input->LA(1);
 
@@ -478,7 +493,7 @@ class EelParser extends AntlrParser {
             }
             switch ($alt5) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:26:8: ':' ID 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->match($this->input,$this->getToken('27'),self::$FOLLOW_27_in_methodIdentifier129); 
                     $this->match($this->input,$this->getToken('ID'),self::$FOLLOW_ID_in_methodIdentifier131); 
@@ -499,21 +514,21 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "methodIdentifier"
 
 
     // $ANTLR start "arguments"
-    // Resources/Private/Grammar/Eel.g:28:1: arguments : '(' ( expression ( ',' expression )* )? ')' ; 
+    // Resources/Private/Grammar/Eel.g
     public function arguments(){
         try {
-            // Resources/Private/Grammar/Eel.g:29:2: ( '(' ( expression ( ',' expression )* )? ')' ) 
-            // Resources/Private/Grammar/Eel.g:29:4: '(' ( expression ( ',' expression )* )? ')' 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->match($this->input,$this->getToken('24'),self::$FOLLOW_24_in_arguments142); 
-            // Resources/Private/Grammar/Eel.g:29:8: ( expression ( ',' expression )* )? 
+            // Resources/Private/Grammar/Eel.g
             $alt7=2;
             $LA7_0 = $this->input->LA(1);
 
@@ -522,14 +537,14 @@ class EelParser extends AntlrParser {
             }
             switch ($alt7) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:29:9: expression ( ',' expression )* 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_expression_in_arguments145);
                     $this->expression();
 
                     $this->state->_fsp--;
 
-                    // Resources/Private/Grammar/Eel.g:29:20: ( ',' expression )* 
+                    // Resources/Private/Grammar/Eel.g
                     //loop6:
                     do {
                         $alt6=2;
@@ -542,7 +557,7 @@ class EelParser extends AntlrParser {
 
                         switch ($alt6) {
                     	case 1 :
-                    	    // Resources/Private/Grammar/Eel.g:29:21: ',' expression 
+                    	    // Resources/Private/Grammar/Eel.g
                     	    {
                     	    $this->match($this->input,$this->getToken('28'),self::$FOLLOW_28_in_arguments148); 
                     	    $this->pushFollow(self::$FOLLOW_expression_in_arguments150);
@@ -577,17 +592,17 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "arguments"
 
 
     // $ANTLR start "term"
-    // Resources/Private/Grammar/Eel.g:31:1: term : ( integerLiteral | floatLiteral | stringLiteral | objectPath ); 
+    // Resources/Private/Grammar/Eel.g
     public function term(){
         try {
-            // Resources/Private/Grammar/Eel.g:31:6: ( integerLiteral | floatLiteral | stringLiteral | objectPath ) 
+            // Resources/Private/Grammar/Eel.g
             $alt8=4;
             $LA8 = $this->input->LA(1);
             if($this->getToken('INT')== $LA8)
@@ -615,7 +630,7 @@ class EelParser extends AntlrParser {
 
             switch ($alt8) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:31:8: integerLiteral 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_integerLiteral_in_term165);
                     $this->integerLiteral();
@@ -626,7 +641,7 @@ class EelParser extends AntlrParser {
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:31:25: floatLiteral 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_floatLiteral_in_term169);
                     $this->floatLiteral();
@@ -637,7 +652,7 @@ class EelParser extends AntlrParser {
                     }
                     break;
                 case 3 :
-                    // Resources/Private/Grammar/Eel.g:31:40: stringLiteral 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_stringLiteral_in_term173);
                     $this->stringLiteral();
@@ -648,7 +663,7 @@ class EelParser extends AntlrParser {
                     }
                     break;
                 case 4 :
-                    // Resources/Private/Grammar/Eel.g:31:56: objectPath 
+                    // Resources/Private/Grammar/Eel.g
                     {
                     $this->pushFollow(self::$FOLLOW_objectPath_in_term177);
                     $this->objectPath();
@@ -668,18 +683,18 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "term"
 
 
     // $ANTLR start "numberOperator"
-    // Resources/Private/Grammar/Eel.g:33:1: numberOperator : NUMBER_OP ; 
+    // Resources/Private/Grammar/Eel.g
     public function numberOperator(){
         try {
-            // Resources/Private/Grammar/Eel.g:33:15: ( NUMBER_OP ) 
-            // Resources/Private/Grammar/Eel.g:33:17: NUMBER_OP 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->match($this->input,$this->getToken('NUMBER_OP'),self::$FOLLOW_NUMBER_OP_in_numberOperator184); 
 
@@ -693,18 +708,18 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "numberOperator"
 
 
     // $ANTLR start "booleanOperator"
-    // Resources/Private/Grammar/Eel.g:35:1: booleanOperator : BOOLEAN_OP ; 
+    // Resources/Private/Grammar/Eel.g
     public function booleanOperator(){
         try {
-            // Resources/Private/Grammar/Eel.g:36:2: ( BOOLEAN_OP ) 
-            // Resources/Private/Grammar/Eel.g:36:4: BOOLEAN_OP 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->match($this->input,$this->getToken('BOOLEAN_OP'),self::$FOLLOW_BOOLEAN_OP_in_booleanOperator193); 
 
@@ -718,18 +733,18 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "booleanOperator"
 
 
     // $ANTLR start "comparisonOperator"
-    // Resources/Private/Grammar/Eel.g:38:1: comparisonOperator : COMP_OP ; 
+    // Resources/Private/Grammar/Eel.g
     public function comparisonOperator(){
         try {
-            // Resources/Private/Grammar/Eel.g:39:2: ( COMP_OP ) 
-            // Resources/Private/Grammar/Eel.g:39:4: COMP_OP 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->match($this->input,$this->getToken('COMP_OP'),self::$FOLLOW_COMP_OP_in_comparisonOperator202); 
 
@@ -743,18 +758,18 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "comparisonOperator"
 
 
     // $ANTLR start "integerLiteral"
-    // Resources/Private/Grammar/Eel.g:41:1: integerLiteral : INT ; 
+    // Resources/Private/Grammar/Eel.g
     public function integerLiteral(){
         try {
-            // Resources/Private/Grammar/Eel.g:42:2: ( INT ) 
-            // Resources/Private/Grammar/Eel.g:42:4: INT 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->match($this->input,$this->getToken('INT'),self::$FOLLOW_INT_in_integerLiteral211); 
 
@@ -768,18 +783,18 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "integerLiteral"
 
 
     // $ANTLR start "floatLiteral"
-    // Resources/Private/Grammar/Eel.g:44:1: floatLiteral : FLOAT ; 
+    // Resources/Private/Grammar/Eel.g
     public function floatLiteral(){
         try {
-            // Resources/Private/Grammar/Eel.g:45:2: ( FLOAT ) 
-            // Resources/Private/Grammar/Eel.g:45:4: FLOAT 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->match($this->input,$this->getToken('FLOAT'),self::$FOLLOW_FLOAT_in_floatLiteral220); 
 
@@ -793,18 +808,18 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "floatLiteral"
 
 
     // $ANTLR start "stringLiteral"
-    // Resources/Private/Grammar/Eel.g:47:1: stringLiteral : StringLiteral ; 
+    // Resources/Private/Grammar/Eel.g
     public function stringLiteral(){
         try {
-            // Resources/Private/Grammar/Eel.g:48:2: ( StringLiteral ) 
-            // Resources/Private/Grammar/Eel.g:48:4: StringLiteral 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->match($this->input,$this->getToken('StringLiteral'),self::$FOLLOW_StringLiteral_in_stringLiteral229); 
 
@@ -818,21 +833,21 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "stringLiteral"
 
 
     // $ANTLR start "objectPath"
-    // Resources/Private/Grammar/Eel.g:50:1: objectPath : ID ( PATH_SEP ID )* ; 
+    // Resources/Private/Grammar/Eel.g
     public function objectPath(){
         try {
-            // Resources/Private/Grammar/Eel.g:50:11: ( ID ( PATH_SEP ID )* ) 
-            // Resources/Private/Grammar/Eel.g:50:13: ID ( PATH_SEP ID )* 
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             $this->match($this->input,$this->getToken('ID'),self::$FOLLOW_ID_in_objectPath236); 
-            // Resources/Private/Grammar/Eel.g:50:16: ( PATH_SEP ID )* 
+            // Resources/Private/Grammar/Eel.g
             //loop9:
             do {
                 $alt9=2;
@@ -845,7 +860,7 @@ class EelParser extends AntlrParser {
 
                 switch ($alt9) {
             	case 1 :
-            	    // Resources/Private/Grammar/Eel.g:50:17: PATH_SEP ID 
+            	    // Resources/Private/Grammar/Eel.g
             	    {
             	    $this->match($this->input,$this->getToken('PATH_SEP'),self::$FOLLOW_PATH_SEP_in_objectPath239); 
             	    $this->match($this->input,$this->getToken('ID'),self::$FOLLOW_ID_in_objectPath241); 
@@ -869,7 +884,7 @@ class EelParser extends AntlrParser {
         catch(Exception $e) {
             throw $e;
         }
-        
+
         return ;
     }
     // $ANTLR end "objectPath"
@@ -877,25 +892,29 @@ class EelParser extends AntlrParser {
     // Delegated rules
 
 
-    
+
 }
 
 function EelParser_DFA1_static(){
-    $eot = array(11, 65535);
-    $eof = array(1, 65535, 1, 8, 1, 65535, 3, 8, 4, 65535, 1, 8);
-    $min = array(1, 4, 1, 5, 1, 65535, 3, 5, 1, 65535, 1, 4, 2, 65535, 1, 
-    5);
-    $max = array(1, 26, 1, 28, 1, 65535, 3, 28, 1, 65535, 1, 4, 2, 65535, 
-    1, 28);
-    $accept = array(2, 65535, 1, 2, 3, 65535, 1, 3, 1, 65535, 1, 4, 1, 1, 
-    1, 65535);
-    $special = array(11, 65535);
-    $transitionS = array(array(1, 1, 3, 65535, 1, 3, 1, 4, 1, 5, 13, 65535, 
-    1, 2, 1, 65535, 1, 6), array(3, 2, 3, 65535, 1, 7, 12, 65535, 1, 9, 
-    1, 8, 1, 65535, 1, 9, 1, 8), array(), array(3, 2, 17, 65535, 1, 8, 2, 
-    65535, 1, 8), array(3, 2, 17, 65535, 1, 8, 2, 65535, 1, 8), array(3, 
-    2, 17, 65535, 1, 8, 2, 65535, 1, 8), array(), array(1, 10), array(), 
-    array(), array(3, 2, 3, 65535, 1, 7, 13, 65535, 1, 8, 2, 65535, 1, 8));
+    $eot = "\xb\xff";
+    $eof = "\x1\xff\x1\x8\x1\xff\x3\x8\x4\xff\x1\x8";
+    $min = "\x1\x4\x1\x5\x1\xff\x3\x5\x1\xff\x1\x4\x2\xff\x1\x5";
+    $max = "\x1\x1a\x1\x1c\x1\xff\x3\x1c\x1\xff\x1\x4\x2\xff\x1\x1c";
+    $accept = "\x2\xff\x1\x2\x3\xff\x1\x3\x1\xff\x1\x4\x1\x1\x1\xff";
+    $special = "\xb\xff";
+    $transitionS = array(
+        "\x1\x1\x3\xff\x1\x3\x1\x4\x1\x5\xd\xff\x1\x2\x1\xff\x1\x6",
+        "\x3\x2\x3\xff\x1\x7\xc\xff\x1\x9\x1\x8\x1\xff\x1\x9\x1\x8",
+        "",
+        "\x3\x2\x11\xff\x1\x8\x2\xff\x1\x8",
+        "\x3\x2\x11\xff\x1\x8\x2\xff\x1\x8",
+        "\x3\x2\x11\xff\x1\x8\x2\xff\x1\x8",
+        "",
+        "\x1\xa",
+        "",
+        "",
+        "\x3\x2\x3\xff\x1\x7\xd\xff\x1\x8\x2\xff\x1\x8"
+    );
 
     $arr = array();
     $arr['eot'] = DFA::unpackRLE($eot);
@@ -913,71 +932,29 @@ function EelParser_DFA1_static(){
     }
     return $arr;
 }
-$EelParser_DFA1 = EelParser_DFA1_static();
 
 class EelParser_DFA1 extends DFA {
 
+    private static $DFA = null;
+
     public function __construct($recognizer) {
-        global $EelParser_DFA1;
-        $DFA = $EelParser_DFA1;
+        if (self::$DFA === null) {
+            self::$DFA = EelParser_DFA1_static();
+        }
+
         $this->recognizer = $recognizer;
         $this->decisionNumber = 1;
-        $this->eot = $DFA['eot'];
-        $this->eof = $DFA['eof'];
-        $this->min = $DFA['min'];
-        $this->max = $DFA['max'];
-        $this->accept = $DFA['accept'];
-        $this->special = $DFA['special'];
-        $this->transition = $DFA['transition'];
+        $this->eot = self::$DFA['eot'];
+        $this->eof = self::$DFA['eof'];
+        $this->min = self::$DFA['min'];
+        $this->max = self::$DFA['max'];
+        $this->accept = self::$DFA['accept'];
+        $this->special = self::$DFA['special'];
+        $this->transition = self::$DFA['transition'];
     }
     public function getDescription() {
         return "10:1: expression : ( methodCall | compositeExpression | notExpression | term );";
     }
 }
  
-
-
-
-EelParser::$FOLLOW_expression_in_fullExpression24 = new Set(array());
-EelParser::$FOLLOW_EOF_in_fullExpression26 = new Set(array(1));
-EelParser::$FOLLOW_methodCall_in_expression35 = new Set(array(1));
-EelParser::$FOLLOW_compositeExpression_in_expression39 = new Set(array(1));
-EelParser::$FOLLOW_notExpression_in_expression43 = new Set(array(1));
-EelParser::$FOLLOW_term_in_expression47 = new Set(array(1));
-EelParser::$FOLLOW_24_in_wrappedComposite56 = new Set(array(4, 8, 9, 10, 24, 26));
-EelParser::$FOLLOW_expression_in_wrappedComposite58 = new Set(array(25));
-EelParser::$FOLLOW_25_in_wrappedComposite60 = new Set(array(1));
-EelParser::$FOLLOW_wrappedComposite_in_compositeExpression70 = new Set(array(5, 6, 7));
-EelParser::$FOLLOW_term_in_compositeExpression74 = new Set(array(5, 6, 7));
-EelParser::$FOLLOW_numberOperator_in_compositeExpression78 = new Set(array(4, 8, 9, 10, 24));
-EelParser::$FOLLOW_booleanOperator_in_compositeExpression82 = new Set(array(4, 8, 9, 10, 24));
-EelParser::$FOLLOW_comparisonOperator_in_compositeExpression86 = new Set(array(4, 8, 9, 10, 24));
-EelParser::$FOLLOW_wrappedComposite_in_compositeExpression90 = new Set(array(1));
-EelParser::$FOLLOW_term_in_compositeExpression94 = new Set(array(1));
-EelParser::$FOLLOW_26_in_notExpression104 = new Set(array(4, 8, 9, 10, 24, 26));
-EelParser::$FOLLOW_expression_in_notExpression106 = new Set(array(1));
-EelParser::$FOLLOW_methodIdentifier_in_methodCall115 = new Set(array(24));
-EelParser::$FOLLOW_arguments_in_methodCall117 = new Set(array(1));
-EelParser::$FOLLOW_ID_in_methodIdentifier126 = new Set(array(1, 27));
-EelParser::$FOLLOW_27_in_methodIdentifier129 = new Set(array(4));
-EelParser::$FOLLOW_ID_in_methodIdentifier131 = new Set(array(1));
-EelParser::$FOLLOW_24_in_arguments142 = new Set(array(4, 8, 9, 10, 24, 25, 26));
-EelParser::$FOLLOW_expression_in_arguments145 = new Set(array(25, 28));
-EelParser::$FOLLOW_28_in_arguments148 = new Set(array(4, 8, 9, 10, 24, 26));
-EelParser::$FOLLOW_expression_in_arguments150 = new Set(array(25, 28));
-EelParser::$FOLLOW_25_in_arguments157 = new Set(array(1));
-EelParser::$FOLLOW_integerLiteral_in_term165 = new Set(array(1));
-EelParser::$FOLLOW_floatLiteral_in_term169 = new Set(array(1));
-EelParser::$FOLLOW_stringLiteral_in_term173 = new Set(array(1));
-EelParser::$FOLLOW_objectPath_in_term177 = new Set(array(1));
-EelParser::$FOLLOW_NUMBER_OP_in_numberOperator184 = new Set(array(1));
-EelParser::$FOLLOW_BOOLEAN_OP_in_booleanOperator193 = new Set(array(1));
-EelParser::$FOLLOW_COMP_OP_in_comparisonOperator202 = new Set(array(1));
-EelParser::$FOLLOW_INT_in_integerLiteral211 = new Set(array(1));
-EelParser::$FOLLOW_FLOAT_in_floatLiteral220 = new Set(array(1));
-EelParser::$FOLLOW_StringLiteral_in_stringLiteral229 = new Set(array(1));
-EelParser::$FOLLOW_ID_in_objectPath236 = new Set(array(1, 11));
-EelParser::$FOLLOW_PATH_SEP_in_objectPath239 = new Set(array(4));
-EelParser::$FOLLOW_ID_in_objectPath241 = new Set(array(1, 11));
-
 ?>

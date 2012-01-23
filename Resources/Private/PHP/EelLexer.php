@@ -1,20 +1,42 @@
 <?php
-// $ANTLR 3.1.3 ��� 06, 2009 18:28:01 Resources/Private/Grammar/Eel.g 2012-01-23 00:01:18
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 Resources/Private/Grammar/Eel.g 2012-01-23 12:32:16
 
 
-# for convenience in actions
-if (!defined('HIDDEN')) define('HIDDEN', BaseRecognizer::$HIDDEN);
+use Antlr\Runtime\IntStream;
+use Antlr\Runtime\DFA;
+use Antlr\Runtime\Parser;
+use Antlr\Runtime\Lexer;
+use Antlr\Runtime\CommonToken;
+use Antlr\Runtime\Set;
+use Antlr\Runtime\Token;
+use Antlr\Runtime\CharStream;
+use Antlr\Runtime\RecognizerSharedState;
+use Antlr\Runtime\ParserRuleReturnScope;
+
+use Antlr\Runtime\EarlyExitException;
+use Antlr\Runtime\FailedPredicateException;
+use Antlr\Runtime\MismatchedRangeException;
+use Antlr\Runtime\MismatchedSetException;
+use Antlr\Runtime\MismatchedTokenException;
+use Antlr\Runtime\NoViableAltException;
+use Antlr\Runtime\RecognitionException;
+use Antlr\Runtime\UnwantedtokenException;
 
 
 function EelLexer_DFA9_static(){
-    $eot = array(5, 65535);
-    $eof = array(5, 65535);
-    $min = array(2, 46, 3, 65535);
-    $max = array(1, 57, 1, 101, 3, 65535);
-    $accept = array(2, 65535, 1, 2, 1, 1, 1, 3);
-    $special = array(5, 65535);
-    $transitionS = array(array(1, 2, 1, 65535, 10, 1), array(1, 3, 1, 65535,
-    10, 1, 11, 65535, 1, 4, 31, 65535, 1, 4), array(), array(), array());
+    $eot = "\x5\xff";
+    $eof = "\x5\xff";
+    $min = "\x2\x2e\x3\xff";
+    $max = "\x1\x39\x1\x65\x3\xff";
+    $accept = "\x2\xff\x1\x2\x1\x1\x1\x3";
+    $special = "\x5\xff";
+    $transitionS = array(
+        "\x1\x2\x1\xff\xa\x1",
+        "\x1\x3\x1\xff\xa\x1\xb\xff\x1\x4\x1f\xff\x1\x4",
+        "",
+        "",
+        ""
+    );
 
     $arr = array();
     $arr['eot'] = DFA::unpackRLE($eot);
@@ -32,42 +54,60 @@ function EelLexer_DFA9_static(){
     }
     return $arr;
 }
-$EelLexer_DFA9 = EelLexer_DFA9_static();
 
 class EelLexer_DFA9 extends DFA {
 
+    private static $DFA = null;
+
     public function __construct($recognizer) {
-        // global $EelLexer_DFA9;
-        $DFA = EelLexer_DFA9_static();
+        if (self::$DFA === null) {
+            self::$DFA = EelLexer_DFA9_static();
+        }
+
         $this->recognizer = $recognizer;
         $this->decisionNumber = 9;
-        $this->eot = $DFA['eot'];
-        $this->eof = $DFA['eof'];
-        $this->min = $DFA['min'];
-        $this->max = $DFA['max'];
-        $this->accept = $DFA['accept'];
-        $this->special = $DFA['special'];
-        $this->transition = $DFA['transition'];
+        $this->eot = self::$DFA['eot'];
+        $this->eof = self::$DFA['eof'];
+        $this->min = self::$DFA['min'];
+        $this->max = self::$DFA['max'];
+        $this->accept = self::$DFA['accept'];
+        $this->special = self::$DFA['special'];
+        $this->transition = self::$DFA['transition'];
     }
     public function getDescription() {
         return "58:1: FLOAT : ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT );";
     }
 }
 function EelLexer_DFA21_static(){
-    $eot = array(3, 65535, 1, 14, 3, 65535, 1, 16, 1, 17, 9, 65535);
-    $eof = array(18, 65535);
-    $min = array(1, 9, 2, 65535, 1, 61, 3, 65535, 1, 46, 1, 48, 9, 65535);
-    $max = array(1, 124, 2, 65535, 1, 61, 3, 65535, 1, 101, 1, 57, 9, 65535);
-    $accept = array(1, 65535, 1, 1, 1, 2, 1, 65535, 1, 4, 1, 5, 1, 6, 2,
-    65535, 1, 9, 1, 10, 1, 12, 1, 13, 1, 14, 1, 3, 1, 8, 1, 7, 1, 11);
-    $special = array(18, 65535);
-    $transitionS = array(array(2, 9, 2, 65535, 1, 9, 18, 65535, 1, 9, 1,
-    3, 1, 10, 2, 65535, 1, 11, 1, 12, 1, 10, 1, 1, 1, 2, 2, 11, 1, 5, 1,
-    11, 1, 8, 1, 11, 10, 7, 1, 4, 1, 65535, 3, 13, 2, 65535, 26, 6, 4, 65535,
-    1, 6, 1, 65535, 26, 6, 1, 65535, 1, 12), array(), array(), array(1,
-    13), array(), array(), array(), array(1, 15, 1, 65535, 10, 7, 11, 65535,
-    1, 15, 31, 65535, 1, 15), array(10, 15), array(), array(), array(),
-    array(), array(), array(), array(), array(), array());
+    $eot = "\x3\xff\x1\xe\x3\xff\x1\x10\x1\x11\x9\xff";
+    $eof = "\x12\xff";
+    $min = "\x1\x9\x2\xff\x1\x3d\x3\xff\x1\x2e\x1\x30\x9\xff";
+    $max = "\x1\x7c\x2\xff\x1\x3d\x3\xff\x1\x65\x1\x39\x9\xff";
+    $accept = "\x1\xff\x1\x1\x1\x2\x1\xff\x1\x4\x1\x5\x1\x6\x2\xff\x1\x9" .
+    "\x1\xa\x1\xc\x1\xd\x1\xe\x1\x3\x1\x8\x1\x7\x1\xb";
+    $special = "\x12\xff";
+    $transitionS = array(
+        "\x2\x9\x2\xff\x1\x9\x12\xff\x1\x9\x1\x3\x1\xa\x2\xff\x1\xb\x1\xc" .
+        "\x1\xa\x1\x1\x1\x2\x2\xb\x1\x5\x1\xb\x1\x8\x1\xb\xa\x7\x1\x4\x1" .
+        "\xff\x3\xd\x2\xff\x1a\x6\x4\xff\x1\x6\x1\xff\x1a\x6\x1\xff\x1\xc",
+        "",
+        "",
+        "\x1\xd",
+        "",
+        "",
+        "",
+        "\x1\xf\x1\xff\xa\x7\xb\xff\x1\xf\x1f\xff\x1\xf",
+        "\xa\xf",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        ""
+    );
 
     $arr = array();
     $arr['eot'] = DFA::unpackRLE($eot);
@@ -85,56 +125,59 @@ function EelLexer_DFA21_static(){
     }
     return $arr;
 }
-$EelLexer_DFA21 = EelLexer_DFA21_static();
 
 class EelLexer_DFA21 extends DFA {
 
+    private static $DFA = null;
+
     public function __construct($recognizer) {
-        // global $EelLexer_DFA21;
-        $DFA = EelLexer_DFA21_static();
+        if (self::$DFA === null) {
+            self::$DFA = EelLexer_DFA21_static();
+        }
+
         $this->recognizer = $recognizer;
         $this->decisionNumber = 21;
-        $this->eot = $DFA['eot'];
-        $this->eof = $DFA['eof'];
-        $this->min = $DFA['min'];
-        $this->max = $DFA['max'];
-        $this->accept = $DFA['accept'];
-        $this->special = $DFA['special'];
-        $this->transition = $DFA['transition'];
+        $this->eot = self::$DFA['eot'];
+        $this->eof = self::$DFA['eof'];
+        $this->min = self::$DFA['min'];
+        $this->max = self::$DFA['max'];
+        $this->accept = self::$DFA['accept'];
+        $this->special = self::$DFA['special'];
+        $this->transition = self::$DFA['transition'];
     }
     public function getDescription() {
         return "1:1: Tokens : ( T__24 | T__25 | T__26 | T__27 | T__28 | ID | INT | FLOAT | WS | StringLiteral | PATH_SEP | NUMBER_OP | BOOLEAN_OP | COMP_OP );";
     }
 }
+ 
 
-
-class EelLexer extends AntlrLexer {
-    static $EXPONENT=12;
-    static $COMP_OP=7;
-    static $T__28=28;
-    static $T__27=27;
-    static $HexEscapeSequence=18;
-    static $T__26=26;
-    static $T__25=25;
-    static $T__24=24;
-    static $UnicodeEscapeSequence=19;
-    static $HEX_DIGIT=23;
-    static $INT=8;
-    static $FLOAT=9;
-    static $NUMBER_OP=5;
-    static $DoubleStringCharacter=14;
-    static $ID=4;
-    static $EOF=-1;
-    static $BOOLEAN_OP=6;
-    static $SingleStringCharacter=15;
-    static $StringLiteral=10;
-    static $WS=13;
-    static $SingleEscapeCharacter=20;
-    static $NonEscapeCharacter=21;
-    static $PATH_SEP=11;
-    static $EscapeCharacter=22;
-    static $CharacterEscapeSequence=17;
-    static $EscapeSequence=16;
+class EelLexer extends Lexer {
+    const T_EXPONENT=12;
+    const T_COMP_OP=7;
+    const T_T__28=28;
+    const T_T__27=27;
+    const T_HexEscapeSequence=18;
+    const T_T__26=26;
+    const T_T__25=25;
+    const T_T__24=24;
+    const T_UnicodeEscapeSequence=19;
+    const T_HEX_DIGIT=23;
+    const T_INT=8;
+    const T_FLOAT=9;
+    const T_NUMBER_OP=5;
+    const T_DoubleStringCharacter=14;
+    const T_ID=4;
+    const T_EOF=-1;
+    const T_BOOLEAN_OP=6;
+    const T_SingleStringCharacter=15;
+    const T_StringLiteral=10;
+    const T_WS=13;
+    const T_SingleEscapeCharacter=20;
+    const T_NonEscapeCharacter=21;
+    const T_PATH_SEP=11;
+    const T_EscapeCharacter=22;
+    const T_CharacterEscapeSequence=17;
+    const T_EscapeSequence=16;
 
     // delegates
     // delegators
@@ -151,12 +194,12 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "T__24"
     function mT__24(){
         try {
-            $_type = EelLexer::$T__24;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:7:7: ( '(' )
-            // Resources/Private/Grammar/Eel.g:7:9: '('
+            $_type = EelLexer::T_T__24;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
-            $this->matchChar(40);
+            $this->matchChar(40); 
 
             }
 
@@ -172,12 +215,12 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "T__25"
     function mT__25(){
         try {
-            $_type = EelLexer::$T__25;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:8:7: ( ')' )
-            // Resources/Private/Grammar/Eel.g:8:9: ')'
+            $_type = EelLexer::T_T__25;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
-            $this->matchChar(41);
+            $this->matchChar(41); 
 
             }
 
@@ -193,12 +236,12 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "T__26"
     function mT__26(){
         try {
-            $_type = EelLexer::$T__26;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:9:7: ( '!' )
-            // Resources/Private/Grammar/Eel.g:9:9: '!'
+            $_type = EelLexer::T_T__26;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
-            $this->matchChar(33);
+            $this->matchChar(33); 
 
             }
 
@@ -214,12 +257,12 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "T__27"
     function mT__27(){
         try {
-            $_type = EelLexer::$T__27;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:10:7: ( ':' )
-            // Resources/Private/Grammar/Eel.g:10:9: ':'
+            $_type = EelLexer::T_T__27;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
-            $this->matchChar(58);
+            $this->matchChar(58); 
 
             }
 
@@ -235,12 +278,12 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "T__28"
     function mT__28(){
         try {
-            $_type = EelLexer::$T__28;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:11:7: ( ',' )
-            // Resources/Private/Grammar/Eel.g:11:9: ','
+            $_type = EelLexer::T_T__28;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
-            $this->matchChar(44);
+            $this->matchChar(44); 
 
             }
 
@@ -256,21 +299,20 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "ID"
     function mID(){
         try {
-            $_type = EelLexer::$ID;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:52:5: ( ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )* )
-            // Resources/Private/Grammar/Eel.g:52:7: ( 'a' .. 'z' | 'A' .. 'Z' | '_' ) ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+            $_type = EelLexer::T_ID;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             if ( ($this->input->LA(1)>=$this->getToken('65') && $this->input->LA(1)<=$this->getToken('90'))||$this->input->LA(1)==$this->getToken('95')||($this->input->LA(1)>=$this->getToken('97') && $this->input->LA(1)<=$this->getToken('122')) ) {
                 $this->input->consume();
 
-            }
-            else {
+            } else {
                 $mse = new MismatchedSetException(null,$this->input);
                 $this->recover($mse);
                 throw $mse;}
 
-            // Resources/Private/Grammar/Eel.g:52:31: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' | '_' )*
+            // Resources/Private/Grammar/Eel.g
             //loop1:
             do {
                 $alt1=2;
@@ -283,13 +325,12 @@ class EelLexer extends AntlrLexer {
 
                 switch ($alt1) {
             	case 1 :
-            	    // Resources/Private/Grammar/Eel.g:
+            	    // Resources/Private/Grammar/Eel.g
             	    {
             	    if ( ($this->input->LA(1)>=$this->getToken('48') && $this->input->LA(1)<=$this->getToken('57'))||($this->input->LA(1)>=$this->getToken('65') && $this->input->LA(1)<=$this->getToken('90'))||$this->input->LA(1)==$this->getToken('95')||($this->input->LA(1)>=$this->getToken('97') && $this->input->LA(1)<=$this->getToken('122')) ) {
             	        $this->input->consume();
 
-            	    }
-            	    else {
+            	    } else {
             	        $mse = new MismatchedSetException(null,$this->input);
             	        $this->recover($mse);
             	        throw $mse;}
@@ -318,12 +359,12 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "INT"
     function mINT(){
         try {
-            $_type = EelLexer::$INT;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:55:5: ( ( '0' .. '9' )+ )
-            // Resources/Private/Grammar/Eel.g:55:7: ( '0' .. '9' )+
+            $_type = EelLexer::T_INT;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
-            // Resources/Private/Grammar/Eel.g:55:7: ( '0' .. '9' )+
+            // Resources/Private/Grammar/Eel.g
             $cnt2=0;
             //loop2:
             do {
@@ -337,9 +378,9 @@ class EelLexer extends AntlrLexer {
 
                 switch ($alt2) {
             	case 1 :
-            	    // Resources/Private/Grammar/Eel.g:55:7: '0' .. '9'
+            	    // Resources/Private/Grammar/Eel.g
             	    {
-            	    $this->matchRange(48,57);
+            	    $this->matchRange(48,57); 
 
             	    }
             	    break;
@@ -368,16 +409,16 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "FLOAT"
     function mFLOAT(){
         try {
-            $_type = EelLexer::$FLOAT;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:59:5: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )? | '.' ( '0' .. '9' )+ ( EXPONENT )? | ( '0' .. '9' )+ EXPONENT )
+            $_type = EelLexer::T_FLOAT;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
             $alt9=3;
             $alt9 = $this->dfa9->predict($this->input);
             switch ($alt9) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:59:9: ( '0' .. '9' )+ '.' ( '0' .. '9' )* ( EXPONENT )?
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    // Resources/Private/Grammar/Eel.g:59:9: ( '0' .. '9' )+
+                    // Resources/Private/Grammar/Eel.g
                     $cnt3=0;
                     //loop3:
                     do {
@@ -391,9 +432,9 @@ class EelLexer extends AntlrLexer {
 
                         switch ($alt3) {
                     	case 1 :
-                    	    // Resources/Private/Grammar/Eel.g:59:10: '0' .. '9'
+                    	    // Resources/Private/Grammar/Eel.g
                     	    {
-                    	    $this->matchRange(48,57);
+                    	    $this->matchRange(48,57); 
 
                     	    }
                     	    break;
@@ -407,8 +448,8 @@ class EelLexer extends AntlrLexer {
                         $cnt3++;
                     } while (true);
 
-                    $this->matchChar(46);
-                    // Resources/Private/Grammar/Eel.g:59:25: ( '0' .. '9' )*
+                    $this->matchChar(46); 
+                    // Resources/Private/Grammar/Eel.g
                     //loop4:
                     do {
                         $alt4=2;
@@ -421,9 +462,9 @@ class EelLexer extends AntlrLexer {
 
                         switch ($alt4) {
                     	case 1 :
-                    	    // Resources/Private/Grammar/Eel.g:59:26: '0' .. '9'
+                    	    // Resources/Private/Grammar/Eel.g
                     	    {
-                    	    $this->matchRange(48,57);
+                    	    $this->matchRange(48,57); 
 
                     	    }
                     	    break;
@@ -433,7 +474,7 @@ class EelLexer extends AntlrLexer {
                         }
                     } while (true);
 
-                    // Resources/Private/Grammar/Eel.g:59:37: ( EXPONENT )?
+                    // Resources/Private/Grammar/Eel.g
                     $alt5=2;
                     $LA5_0 = $this->input->LA(1);
 
@@ -442,9 +483,9 @@ class EelLexer extends AntlrLexer {
                     }
                     switch ($alt5) {
                         case 1 :
-                            // Resources/Private/Grammar/Eel.g:59:37: EXPONENT
+                            // Resources/Private/Grammar/Eel.g
                             {
-                            $this->mEXPONENT();
+                            $this->mEXPONENT(); 
 
                             }
                             break;
@@ -455,10 +496,10 @@ class EelLexer extends AntlrLexer {
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:60:9: '.' ( '0' .. '9' )+ ( EXPONENT )?
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchChar(46);
-                    // Resources/Private/Grammar/Eel.g:60:13: ( '0' .. '9' )+
+                    $this->matchChar(46); 
+                    // Resources/Private/Grammar/Eel.g
                     $cnt6=0;
                     //loop6:
                     do {
@@ -472,9 +513,9 @@ class EelLexer extends AntlrLexer {
 
                         switch ($alt6) {
                     	case 1 :
-                    	    // Resources/Private/Grammar/Eel.g:60:14: '0' .. '9'
+                    	    // Resources/Private/Grammar/Eel.g
                     	    {
-                    	    $this->matchRange(48,57);
+                    	    $this->matchRange(48,57); 
 
                     	    }
                     	    break;
@@ -488,7 +529,7 @@ class EelLexer extends AntlrLexer {
                         $cnt6++;
                     } while (true);
 
-                    // Resources/Private/Grammar/Eel.g:60:25: ( EXPONENT )?
+                    // Resources/Private/Grammar/Eel.g
                     $alt7=2;
                     $LA7_0 = $this->input->LA(1);
 
@@ -497,9 +538,9 @@ class EelLexer extends AntlrLexer {
                     }
                     switch ($alt7) {
                         case 1 :
-                            // Resources/Private/Grammar/Eel.g:60:25: EXPONENT
+                            // Resources/Private/Grammar/Eel.g
                             {
-                            $this->mEXPONENT();
+                            $this->mEXPONENT(); 
 
                             }
                             break;
@@ -510,9 +551,9 @@ class EelLexer extends AntlrLexer {
                     }
                     break;
                 case 3 :
-                    // Resources/Private/Grammar/Eel.g:61:9: ( '0' .. '9' )+ EXPONENT
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    // Resources/Private/Grammar/Eel.g:61:9: ( '0' .. '9' )+
+                    // Resources/Private/Grammar/Eel.g
                     $cnt8=0;
                     //loop8:
                     do {
@@ -526,9 +567,9 @@ class EelLexer extends AntlrLexer {
 
                         switch ($alt8) {
                     	case 1 :
-                    	    // Resources/Private/Grammar/Eel.g:61:10: '0' .. '9'
+                    	    // Resources/Private/Grammar/Eel.g
                     	    {
-                    	    $this->matchRange(48,57);
+                    	    $this->matchRange(48,57); 
 
                     	    }
                     	    break;
@@ -542,7 +583,7 @@ class EelLexer extends AntlrLexer {
                         $cnt8++;
                     } while (true);
 
-                    $this->mEXPONENT();
+                    $this->mEXPONENT(); 
 
                     }
                     break;
@@ -560,16 +601,15 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "WS"
     function mWS(){
         try {
-            $_type = EelLexer::$WS;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:64:5: ( ( ' ' | '\\t' | '\\r' | '\\n' ) )
-            // Resources/Private/Grammar/Eel.g:64:9: ( ' ' | '\\t' | '\\r' | '\\n' )
+            $_type = EelLexer::T_WS;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             if ( ($this->input->LA(1)>=$this->getToken('9') && $this->input->LA(1)<=$this->getToken('10'))||$this->input->LA(1)==$this->getToken('13')||$this->input->LA(1)==$this->getToken('32') ) {
                 $this->input->consume();
 
-            }
-            else {
+            } else {
                 $mse = new MismatchedSetException(null,$this->input);
                 $this->recover($mse);
                 throw $mse;}
@@ -590,9 +630,9 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "StringLiteral"
     function mStringLiteral(){
         try {
-            $_type = EelLexer::$StringLiteral;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:74:2: ( '\"' ( DoubleStringCharacter )* '\"' | '\\'' ( SingleStringCharacter )* '\\'' )
+            $_type = EelLexer::T_StringLiteral;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
             $alt12=2;
             $LA12_0 = $this->input->LA(1);
 
@@ -609,10 +649,10 @@ class EelLexer extends AntlrLexer {
             }
             switch ($alt12) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:74:4: '\"' ( DoubleStringCharacter )* '\"'
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchChar(34);
-                    // Resources/Private/Grammar/Eel.g:74:8: ( DoubleStringCharacter )*
+                    $this->matchChar(34); 
+                    // Resources/Private/Grammar/Eel.g
                     //loop10:
                     do {
                         $alt10=2;
@@ -625,9 +665,9 @@ class EelLexer extends AntlrLexer {
 
                         switch ($alt10) {
                     	case 1 :
-                    	    // Resources/Private/Grammar/Eel.g:74:8: DoubleStringCharacter
+                    	    // Resources/Private/Grammar/Eel.g
                     	    {
-                    	    $this->mDoubleStringCharacter();
+                    	    $this->mDoubleStringCharacter(); 
 
                     	    }
                     	    break;
@@ -637,15 +677,15 @@ class EelLexer extends AntlrLexer {
                         }
                     } while (true);
 
-                    $this->matchChar(34);
+                    $this->matchChar(34); 
 
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:75:4: '\\'' ( SingleStringCharacter )* '\\''
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchChar(39);
-                    // Resources/Private/Grammar/Eel.g:75:9: ( SingleStringCharacter )*
+                    $this->matchChar(39); 
+                    // Resources/Private/Grammar/Eel.g
                     //loop11:
                     do {
                         $alt11=2;
@@ -658,9 +698,9 @@ class EelLexer extends AntlrLexer {
 
                         switch ($alt11) {
                     	case 1 :
-                    	    // Resources/Private/Grammar/Eel.g:75:9: SingleStringCharacter
+                    	    // Resources/Private/Grammar/Eel.g
                     	    {
-                    	    $this->mSingleStringCharacter();
+                    	    $this->mSingleStringCharacter(); 
 
                     	    }
                     	    break;
@@ -670,7 +710,7 @@ class EelLexer extends AntlrLexer {
                         }
                     } while (true);
 
-                    $this->matchChar(39);
+                    $this->matchChar(39); 
 
                     }
                     break;
@@ -688,7 +728,7 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "DoubleStringCharacter"
     function mDoubleStringCharacter(){
         try {
-            // Resources/Private/Grammar/Eel.g:79:2: (~ ( '\"' | '\\\\' ) | '\\\\' EscapeSequence )
+            // Resources/Private/Grammar/Eel.g
             $alt13=2;
             $LA13_0 = $this->input->LA(1);
 
@@ -705,13 +745,12 @@ class EelLexer extends AntlrLexer {
             }
             switch ($alt13) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:79:4: ~ ( '\"' | '\\\\' )
+                    // Resources/Private/Grammar/Eel.g
                     {
                     if ( ($this->input->LA(1)>=$this->getToken('0') && $this->input->LA(1)<=$this->getToken('33'))||($this->input->LA(1)>=$this->getToken('35') && $this->input->LA(1)<=$this->getToken('91'))||($this->input->LA(1)>=$this->getToken('93') && $this->input->LA(1)<=$this->getToken('65535')) ) {
                         $this->input->consume();
 
-                    }
-                    else {
+                    } else {
                         $mse = new MismatchedSetException(null,$this->input);
                         $this->recover($mse);
                         throw $mse;}
@@ -720,10 +759,10 @@ class EelLexer extends AntlrLexer {
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:80:4: '\\\\' EscapeSequence
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchChar(92);
-                    $this->mEscapeSequence();
+                    $this->matchChar(92); 
+                    $this->mEscapeSequence(); 
 
                     }
                     break;
@@ -739,7 +778,7 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "SingleStringCharacter"
     function mSingleStringCharacter(){
         try {
-            // Resources/Private/Grammar/Eel.g:84:2: (~ ( '\\'' | '\\\\' ) | '\\\\' EscapeSequence )
+            // Resources/Private/Grammar/Eel.g
             $alt14=2;
             $LA14_0 = $this->input->LA(1);
 
@@ -756,13 +795,12 @@ class EelLexer extends AntlrLexer {
             }
             switch ($alt14) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:84:4: ~ ( '\\'' | '\\\\' )
+                    // Resources/Private/Grammar/Eel.g
                     {
                     if ( ($this->input->LA(1)>=$this->getToken('0') && $this->input->LA(1)<=$this->getToken('38'))||($this->input->LA(1)>=$this->getToken('40') && $this->input->LA(1)<=$this->getToken('91'))||($this->input->LA(1)>=$this->getToken('93') && $this->input->LA(1)<=$this->getToken('65535')) ) {
                         $this->input->consume();
 
-                    }
-                    else {
+                    } else {
                         $mse = new MismatchedSetException(null,$this->input);
                         $this->recover($mse);
                         throw $mse;}
@@ -771,10 +809,10 @@ class EelLexer extends AntlrLexer {
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:85:4: '\\\\' EscapeSequence
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchChar(92);
-                    $this->mEscapeSequence();
+                    $this->matchChar(92); 
+                    $this->mEscapeSequence(); 
 
                     }
                     break;
@@ -790,7 +828,7 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "EscapeSequence"
     function mEscapeSequence(){
         try {
-            // Resources/Private/Grammar/Eel.g:89:2: ( CharacterEscapeSequence | '0' | HexEscapeSequence | UnicodeEscapeSequence )
+            // Resources/Private/Grammar/Eel.g
             $alt15=4;
             $LA15_0 = $this->input->LA(1);
 
@@ -813,30 +851,30 @@ class EelLexer extends AntlrLexer {
             }
             switch ($alt15) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:89:4: CharacterEscapeSequence
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->mCharacterEscapeSequence();
+                    $this->mCharacterEscapeSequence(); 
 
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:90:4: '0'
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchChar(48);
+                    $this->matchChar(48); 
 
                     }
                     break;
                 case 3 :
-                    // Resources/Private/Grammar/Eel.g:91:4: HexEscapeSequence
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->mHexEscapeSequence();
+                    $this->mHexEscapeSequence(); 
 
                     }
                     break;
                 case 4 :
-                    // Resources/Private/Grammar/Eel.g:92:4: UnicodeEscapeSequence
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->mUnicodeEscapeSequence();
+                    $this->mUnicodeEscapeSequence(); 
 
                     }
                     break;
@@ -852,7 +890,7 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "CharacterEscapeSequence"
     function mCharacterEscapeSequence(){
         try {
-            // Resources/Private/Grammar/Eel.g:96:2: ( SingleEscapeCharacter | NonEscapeCharacter )
+            // Resources/Private/Grammar/Eel.g
             $alt16=2;
             $LA16_0 = $this->input->LA(1);
 
@@ -869,16 +907,16 @@ class EelLexer extends AntlrLexer {
             }
             switch ($alt16) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:96:4: SingleEscapeCharacter
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->mSingleEscapeCharacter();
+                    $this->mSingleEscapeCharacter(); 
 
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:97:4: NonEscapeCharacter
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->mNonEscapeCharacter();
+                    $this->mNonEscapeCharacter(); 
 
                     }
                     break;
@@ -894,14 +932,13 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "NonEscapeCharacter"
     function mNonEscapeCharacter(){
         try {
-            // Resources/Private/Grammar/Eel.g:101:2: (~ ( EscapeCharacter ) )
-            // Resources/Private/Grammar/Eel.g:101:4: ~ ( EscapeCharacter )
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             if ( ($this->input->LA(1)>=$this->getToken('0') && $this->input->LA(1)<=$this->getToken('33'))||($this->input->LA(1)>=$this->getToken('35') && $this->input->LA(1)<=$this->getToken('38'))||($this->input->LA(1)>=$this->getToken('40') && $this->input->LA(1)<=$this->getToken('47'))||($this->input->LA(1)>=$this->getToken('58') && $this->input->LA(1)<=$this->getToken('91'))||($this->input->LA(1)>=$this->getToken('93') && $this->input->LA(1)<=$this->getToken('97'))||($this->input->LA(1)>=$this->getToken('99') && $this->input->LA(1)<=$this->getToken('101'))||($this->input->LA(1)>=$this->getToken('103') && $this->input->LA(1)<=$this->getToken('109'))||($this->input->LA(1)>=$this->getToken('111') && $this->input->LA(1)<=$this->getToken('113'))||$this->input->LA(1)==$this->getToken('115')||$this->input->LA(1)==$this->getToken('119')||($this->input->LA(1)>=$this->getToken('121') && $this->input->LA(1)<=$this->getToken('65535')) ) {
                 $this->input->consume();
 
-            }
-            else {
+            } else {
                 $mse = new MismatchedSetException(null,$this->input);
                 $this->recover($mse);
                 throw $mse;}
@@ -919,14 +956,13 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "SingleEscapeCharacter"
     function mSingleEscapeCharacter(){
         try {
-            // Resources/Private/Grammar/Eel.g:105:2: ( '\\'' | '\"' | '\\\\' | 'b' | 'f' | 'n' | 'r' | 't' | 'v' )
-            // Resources/Private/Grammar/Eel.g:
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             if ( $this->input->LA(1)==$this->getToken('34')||$this->input->LA(1)==$this->getToken('39')||$this->input->LA(1)==$this->getToken('92')||$this->input->LA(1)==$this->getToken('98')||$this->input->LA(1)==$this->getToken('102')||$this->input->LA(1)==$this->getToken('110')||$this->input->LA(1)==$this->getToken('114')||$this->input->LA(1)==$this->getToken('116')||$this->input->LA(1)==$this->getToken('118') ) {
                 $this->input->consume();
 
-            }
-            else {
+            } else {
                 $mse = new MismatchedSetException(null,$this->input);
                 $this->recover($mse);
                 throw $mse;}
@@ -944,14 +980,13 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "EscapeCharacter"
     function mEscapeCharacter(){
         try {
-            // Resources/Private/Grammar/Eel.g:109:2: ( SingleEscapeCharacter | '0' .. '9' | 'x' | 'u' )
-            // Resources/Private/Grammar/Eel.g:
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             if ( $this->input->LA(1)==$this->getToken('34')||$this->input->LA(1)==$this->getToken('39')||($this->input->LA(1)>=$this->getToken('48') && $this->input->LA(1)<=$this->getToken('57'))||$this->input->LA(1)==$this->getToken('92')||$this->input->LA(1)==$this->getToken('98')||$this->input->LA(1)==$this->getToken('102')||$this->input->LA(1)==$this->getToken('110')||$this->input->LA(1)==$this->getToken('114')||($this->input->LA(1)>=$this->getToken('116') && $this->input->LA(1)<=$this->getToken('118'))||$this->input->LA(1)==$this->getToken('120') ) {
                 $this->input->consume();
 
-            }
-            else {
+            } else {
                 $mse = new MismatchedSetException(null,$this->input);
                 $this->recover($mse);
                 throw $mse;}
@@ -969,12 +1004,12 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "HexEscapeSequence"
     function mHexEscapeSequence(){
         try {
-            // Resources/Private/Grammar/Eel.g:116:2: ( 'x' HEX_DIGIT HEX_DIGIT )
-            // Resources/Private/Grammar/Eel.g:116:4: 'x' HEX_DIGIT HEX_DIGIT
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
-            $this->matchChar(120);
-            $this->mHEX_DIGIT();
-            $this->mHEX_DIGIT();
+            $this->matchChar(120); 
+            $this->mHEX_DIGIT(); 
+            $this->mHEX_DIGIT(); 
 
             }
 
@@ -988,14 +1023,14 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "UnicodeEscapeSequence"
     function mUnicodeEscapeSequence(){
         try {
-            // Resources/Private/Grammar/Eel.g:120:2: ( 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT )
-            // Resources/Private/Grammar/Eel.g:120:4: 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
-            $this->matchChar(117);
-            $this->mHEX_DIGIT();
-            $this->mHEX_DIGIT();
-            $this->mHEX_DIGIT();
-            $this->mHEX_DIGIT();
+            $this->matchChar(117); 
+            $this->mHEX_DIGIT(); 
+            $this->mHEX_DIGIT(); 
+            $this->mHEX_DIGIT(); 
+            $this->mHEX_DIGIT(); 
 
             }
 
@@ -1009,19 +1044,18 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "EXPONENT"
     function mEXPONENT(){
         try {
-            // Resources/Private/Grammar/Eel.g:124:10: ( ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+ )
-            // Resources/Private/Grammar/Eel.g:124:12: ( 'e' | 'E' ) ( '+' | '-' )? ( '0' .. '9' )+
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             if ( $this->input->LA(1)==$this->getToken('69')||$this->input->LA(1)==$this->getToken('101') ) {
                 $this->input->consume();
 
-            }
-            else {
+            } else {
                 $mse = new MismatchedSetException(null,$this->input);
                 $this->recover($mse);
                 throw $mse;}
 
-            // Resources/Private/Grammar/Eel.g:124:22: ( '+' | '-' )?
+            // Resources/Private/Grammar/Eel.g
             $alt17=2;
             $LA17_0 = $this->input->LA(1);
 
@@ -1030,13 +1064,12 @@ class EelLexer extends AntlrLexer {
             }
             switch ($alt17) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:
+                    // Resources/Private/Grammar/Eel.g
                     {
                     if ( $this->input->LA(1)==$this->getToken('43')||$this->input->LA(1)==$this->getToken('45') ) {
                         $this->input->consume();
 
-                    }
-                    else {
+                    } else {
                         $mse = new MismatchedSetException(null,$this->input);
                         $this->recover($mse);
                         throw $mse;}
@@ -1047,7 +1080,7 @@ class EelLexer extends AntlrLexer {
 
             }
 
-            // Resources/Private/Grammar/Eel.g:124:33: ( '0' .. '9' )+
+            // Resources/Private/Grammar/Eel.g
             $cnt18=0;
             //loop18:
             do {
@@ -1061,9 +1094,9 @@ class EelLexer extends AntlrLexer {
 
                 switch ($alt18) {
             	case 1 :
-            	    // Resources/Private/Grammar/Eel.g:124:34: '0' .. '9'
+            	    // Resources/Private/Grammar/Eel.g
             	    {
-            	    $this->matchRange(48,57);
+            	    $this->matchRange(48,57); 
 
             	    }
             	    break;
@@ -1090,14 +1123,13 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "HEX_DIGIT"
     function mHEX_DIGIT(){
         try {
-            // Resources/Private/Grammar/Eel.g:127:11: ( ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' ) )
-            // Resources/Private/Grammar/Eel.g:127:13: ( '0' .. '9' | 'a' .. 'f' | 'A' .. 'F' )
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             if ( ($this->input->LA(1)>=$this->getToken('48') && $this->input->LA(1)<=$this->getToken('57'))||($this->input->LA(1)>=$this->getToken('65') && $this->input->LA(1)<=$this->getToken('70'))||($this->input->LA(1)>=$this->getToken('97') && $this->input->LA(1)<=$this->getToken('102')) ) {
                 $this->input->consume();
 
-            }
-            else {
+            } else {
                 $mse = new MismatchedSetException(null,$this->input);
                 $this->recover($mse);
                 throw $mse;}
@@ -1115,12 +1147,12 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "PATH_SEP"
     function mPATH_SEP(){
         try {
-            $_type = EelLexer::$PATH_SEP;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:129:9: ( '.' )
-            // Resources/Private/Grammar/Eel.g:129:11: '.'
+            $_type = EelLexer::T_PATH_SEP;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
-            $this->matchChar(46);
+            $this->matchChar(46); 
 
             }
 
@@ -1136,16 +1168,15 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "NUMBER_OP"
     function mNUMBER_OP(){
         try {
-            $_type = EelLexer::$NUMBER_OP;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:132:2: ( '+' | '-' | '/' | '*' | '%' )
-            // Resources/Private/Grammar/Eel.g:
+            $_type = EelLexer::T_NUMBER_OP;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
+            // Resources/Private/Grammar/Eel.g
             {
             if ( $this->input->LA(1)==$this->getToken('37')||($this->input->LA(1)>=$this->getToken('42') && $this->input->LA(1)<=$this->getToken('43'))||$this->input->LA(1)==$this->getToken('45')||$this->input->LA(1)==$this->getToken('47') ) {
                 $this->input->consume();
 
-            }
-            else {
+            } else {
                 $mse = new MismatchedSetException(null,$this->input);
                 $this->recover($mse);
                 throw $mse;}
@@ -1165,9 +1196,9 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "BOOLEAN_OP"
     function mBOOLEAN_OP(){
         try {
-            $_type = EelLexer::$BOOLEAN_OP;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:135:2: ( '&&' | '||' )
+            $_type = EelLexer::T_BOOLEAN_OP;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
             $alt19=2;
             $LA19_0 = $this->input->LA(1);
 
@@ -1184,17 +1215,17 @@ class EelLexer extends AntlrLexer {
             }
             switch ($alt19) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:135:4: '&&'
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchString("&&");
+                    $this->matchString("&&"); 
 
 
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:135:11: '||'
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchString("||");
+                    $this->matchString("||"); 
 
 
                     }
@@ -1213,9 +1244,9 @@ class EelLexer extends AntlrLexer {
     // $ANTLR start "COMP_OP"
     function mCOMP_OP(){
         try {
-            $_type = EelLexer::$COMP_OP;
-            $_channel = EelLexer::$DEFAULT_TOKEN_CHANNEL;
-            // Resources/Private/Grammar/Eel.g:137:9: ( '==' | '!=' | '<=' | '>=' | '<' | '>' )
+            $_type = EelLexer::T_COMP_OP;
+            $_channel = EelLexer::DEFAULT_TOKEN_CHANNEL;
+            // Resources/Private/Grammar/Eel.g
             $alt20=6;
             $LA20 = $this->input->LA(1);
             if($this->getToken('61')== $LA20)
@@ -1255,48 +1286,48 @@ class EelLexer extends AntlrLexer {
 
             switch ($alt20) {
                 case 1 :
-                    // Resources/Private/Grammar/Eel.g:137:11: '=='
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchString("==");
+                    $this->matchString("=="); 
 
 
                     }
                     break;
                 case 2 :
-                    // Resources/Private/Grammar/Eel.g:137:18: '!='
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchString("!=");
+                    $this->matchString("!="); 
 
 
                     }
                     break;
                 case 3 :
-                    // Resources/Private/Grammar/Eel.g:137:25: '<='
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchString("<=");
+                    $this->matchString("<="); 
 
 
                     }
                     break;
                 case 4 :
-                    // Resources/Private/Grammar/Eel.g:137:32: '>='
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchString(">=");
+                    $this->matchString(">="); 
 
 
                     }
                     break;
                 case 5 :
-                    // Resources/Private/Grammar/Eel.g:137:39: '<'
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchChar(60);
+                    $this->matchChar(60); 
 
                     }
                     break;
                 case 6 :
-                    // Resources/Private/Grammar/Eel.g:137:45: '>'
+                    // Resources/Private/Grammar/Eel.g
                     {
-                    $this->matchChar(62);
+                    $this->matchChar(62); 
 
                     }
                     break;
@@ -1312,105 +1343,105 @@ class EelLexer extends AntlrLexer {
     // $ANTLR end "COMP_OP"
 
     function mTokens(){
-        // Resources/Private/Grammar/Eel.g:1:8: ( T__24 | T__25 | T__26 | T__27 | T__28 | ID | INT | FLOAT | WS | StringLiteral | PATH_SEP | NUMBER_OP | BOOLEAN_OP | COMP_OP )
+        // Resources/Private/Grammar/Eel.g
         $alt21=14;
         $alt21 = $this->dfa21->predict($this->input);
         switch ($alt21) {
             case 1 :
-                // Resources/Private/Grammar/Eel.g:1:10: T__24
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mT__24();
+                $this->mT__24(); 
 
                 }
                 break;
             case 2 :
-                // Resources/Private/Grammar/Eel.g:1:16: T__25
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mT__25();
+                $this->mT__25(); 
 
                 }
                 break;
             case 3 :
-                // Resources/Private/Grammar/Eel.g:1:22: T__26
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mT__26();
+                $this->mT__26(); 
 
                 }
                 break;
             case 4 :
-                // Resources/Private/Grammar/Eel.g:1:28: T__27
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mT__27();
+                $this->mT__27(); 
 
                 }
                 break;
             case 5 :
-                // Resources/Private/Grammar/Eel.g:1:34: T__28
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mT__28();
+                $this->mT__28(); 
 
                 }
                 break;
             case 6 :
-                // Resources/Private/Grammar/Eel.g:1:40: ID
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mID();
+                $this->mID(); 
 
                 }
                 break;
             case 7 :
-                // Resources/Private/Grammar/Eel.g:1:43: INT
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mINT();
+                $this->mINT(); 
 
                 }
                 break;
             case 8 :
-                // Resources/Private/Grammar/Eel.g:1:47: FLOAT
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mFLOAT();
+                $this->mFLOAT(); 
 
                 }
                 break;
             case 9 :
-                // Resources/Private/Grammar/Eel.g:1:53: WS
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mWS();
+                $this->mWS(); 
 
                 }
                 break;
             case 10 :
-                // Resources/Private/Grammar/Eel.g:1:56: StringLiteral
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mStringLiteral();
+                $this->mStringLiteral(); 
 
                 }
                 break;
             case 11 :
-                // Resources/Private/Grammar/Eel.g:1:70: PATH_SEP
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mPATH_SEP();
+                $this->mPATH_SEP(); 
 
                 }
                 break;
             case 12 :
-                // Resources/Private/Grammar/Eel.g:1:79: NUMBER_OP
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mNUMBER_OP();
+                $this->mNUMBER_OP(); 
 
                 }
                 break;
             case 13 :
-                // Resources/Private/Grammar/Eel.g:1:89: BOOLEAN_OP
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mBOOLEAN_OP();
+                $this->mBOOLEAN_OP(); 
 
                 }
                 break;
             case 14 :
-                // Resources/Private/Grammar/Eel.g:1:100: COMP_OP
+                // Resources/Private/Grammar/Eel.g
                 {
-                $this->mCOMP_OP();
+                $this->mCOMP_OP(); 
 
                 }
                 break;

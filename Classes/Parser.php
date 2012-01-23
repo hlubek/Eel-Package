@@ -9,18 +9,17 @@ class Parser {
 	 * @return mixed
 	 */
 	public function parse($input) {
-		// FIXME Bad include
-		require_once(__DIR__ . '/../Resources/Private/PHP/Antlr/antlr.php');
-
 		require_once(__DIR__ . '/../Resources/Private/PHP/EelLexer.php');
 		require_once(__DIR__ . '/../Resources/Private/PHP/EelParser.php');
 
-		$input = new \ANTLRStringStream($input);
+		$input = new \Antlr\Runtime\ANTLRStringStream($input);
 		$lexer = new \EelLexer($input);
 
-		$tokens = new \CommonTokenStream($lexer);
+		$tokens = new \Antlr\Runtime\CommonTokenStream($lexer);
 
-		\TYPO3\FLOW3\var_dump($tokens->getTokens(), 'Tokens');
+		foreach ($tokens->getTokens() as $token) {
+			var_dump((string)$token);
+		}
 
 		$parser = new \EelParser($tokens);
 		$parser->fullExpression();
