@@ -28,7 +28,7 @@ methodIdentifier
 arguments
 	:	'(' (expression (',' expression)* )? ')';
 
-term	:	integerLiteral | floatLiteral | stringLiteral | objectPath;
+term	:	floatLiteral | integerLiteral | stringLiteral | objectPath;
 
 numberOperator:	NUMBER_OP;
 
