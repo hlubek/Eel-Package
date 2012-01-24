@@ -42,8 +42,8 @@ Term: NumberLiteral | StringLiteral
 */
 
 /*!* CombinedExpressions
-Expression: (NotExpression | Term) > Comparison?
-	function Comparison(&$result, $sub) {
+Expression: (WrappedExpression | NotExpression | Term) > (Comparison | Calculation)?
+	function WrappedExpression(&$result, $sub) {
 		$result['val'] = $sub['val'];
 	}
 	function NotExpression(&$result, $sub) {
@@ -51,6 +51,27 @@ Expression: (NotExpression | Term) > Comparison?
 	}
 	function Term(&$result, $sub) {
 		$result['val'] = $sub['val'];
+	}
+	function Calculation(&$result, $sub) {
+		$lval = $result['val'];
+		$rval = $sub['rval'];
+		switch ($sub['op']) {
+		case '+':
+			$result['val'] = ($lval + $rval);
+			break;
+		case '-':
+			$result['val'] = ($lval - $rval);
+			break;
+		case '/':
+			$result['val'] = ($lval / $rval);
+			break;
+		case '*':
+			$result['val'] = ($lval * $rval);
+			break;
+		case '%':
+			$result['val'] = ($lval % $rval);
+			break;
+		}
 	}
 	function Comparison(&$result, $sub) {
 		// Take the computed value (left side)
@@ -74,13 +95,22 @@ Expression: (NotExpression | Term) > Comparison?
 			break;
 		}
 	}
-NotExpression: ('!' | 'not' [) Expression
+WrappedExpression: '(' > Expression > ')'
+	function Expression(&$result, $sub) {
+		$result['val'] = $sub['val'];
+	}
+NotExpression: (/ ! | not\s+ /) > Expression
 	function Expression(&$result, $sub) {
 		$result['val'] = !(boolean)$sub['val'];
 	}
-Comparison: comp:('==' | '<=' | '>=' | '<' | '>') > exp:Expression
+Comparison: comp:/ == | <= | >= | < | > / > exp:Expression
 	function __finalise(&$self) {
 		$self['comp'] = $self['comp']['text'];
+		$self['rval'] = $self['exp']['val'];
+	}
+Calculation: op:/ \+ | \- | \/ | \* | % / > exp:Expression
+	function __finalise(&$self) {
+		$self['op'] = $self['op']['text'];
 		$self['rval'] = $self['exp']['val'];
 	}
 */

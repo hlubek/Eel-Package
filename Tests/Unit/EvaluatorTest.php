@@ -88,6 +88,8 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 			array('!1', $c, FALSE),
 			// Not an empty string is true
 			array('!""', $c, TRUE),
+			// Some whitespace allowed
+			array('!0', $c, TRUE),
 			// A not can be a word
 			array('not 0', $c, TRUE),
 		);
@@ -112,6 +114,34 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 			array('1 <0', $c, FALSE),
 			// Multiple expressions, eval'd from left to right
 			array('0 < 1 == 1', $c, TRUE),
+			// Parenthesed comparisons
+			array('(0 > 1) < (0 < 1))', $c, TRUE),
+		);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function calculationExpressions() {
+		$c = new Context();
+		return array(
+			// Very basic
+			array('1 + 1', $c, 2),
+			array('1 - 1', $c, 0),
+			array('2*2', $c, 4),
+		);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function combinedExpressions() {
+		$c = new Context();
+		return array(
+			// We need to paren this
+			array('(1 + 2) > 3', $c, FALSE),
+			// But comparison on left side works because of left parsing order
+			array('1 < 1 + 1', $c, TRUE),
 		);
 	}
 
@@ -176,6 +206,32 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param mixed $result
 	 */
 	public function comparisonExpressionsCanBeParsed($expression, $context, $result) {
+		$evaluator = new Evaluator();
+		$this->assertSame($result, $evaluator->evaluate($expression, $context));
+	}
+
+	/**
+	 * @test
+	 * @dataProvider calculationExpressions
+	 *
+	 * @param string $expression
+	 * @param \Eel\Context $context
+	 * @param mixed $result
+	 */
+	public function calculationExpressionsCanBeParsed($expression, $context, $result) {
+		$evaluator = new Evaluator();
+		$this->assertSame($result, $evaluator->evaluate($expression, $context));
+	}
+
+	/**
+	 * @test
+	 * @dataProvider combinedExpressions
+	 *
+	 * @param string $expression
+	 * @param \Eel\Context $context
+	 * @param mixed $result
+	 */
+	public function combinedExpressionsCanBeParsed($expression, $context, $result) {
 		$evaluator = new Evaluator();
 		$this->assertSame($result, $evaluator->evaluate($expression, $context));
 	}
