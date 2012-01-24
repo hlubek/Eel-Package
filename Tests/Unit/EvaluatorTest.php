@@ -94,6 +94,28 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	}
 
 	/**
+	 * @return array
+	 */
+	public function comparisonExpressions() {
+		$c = new Context();
+		return array(
+			array('1==0', $c, FALSE),
+			array('1==1', $c, TRUE),
+			array('0 == 0', $c, TRUE),
+			// It's strict
+			array('0==""', $c, FALSE),
+			// Quoting doesn't matter
+			array('"Foo"==\'Foo\'', $c, TRUE),
+			// Whitespace okay!
+			array('1> 0', $c, TRUE),
+			// Whitespace okay!
+			array('1 <0', $c, FALSE),
+			// Multiple expressions, eval'd from left to right
+			array('0 < 1 == 1', $c, TRUE),
+		);
+	}
+
+	/**
 	 * @test
 	 * @dataProvider integerLiterals
 	 *
@@ -141,6 +163,19 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param mixed $result
 	 */
 	public function notExpressionsCanBeParsed($expression, $context, $result) {
+		$evaluator = new Evaluator();
+		$this->assertSame($result, $evaluator->evaluate($expression, $context));
+	}
+
+	/**
+	 * @test
+	 * @dataProvider comparisonExpressions
+	 *
+	 * @param string $expression
+	 * @param \Eel\Context $context
+	 * @param mixed $result
+	 */
+	public function comparisonExpressionsCanBeParsed($expression, $context, $result) {
 		$evaluator = new Evaluator();
 		$this->assertSame($result, $evaluator->evaluate($expression, $context));
 	}
