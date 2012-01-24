@@ -88,6 +88,8 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 			array('!1', $c, FALSE),
 			// Not an empty string is true
 			array('!""', $c, TRUE),
+			// A not can be a word
+			array('not 0', $c, TRUE),
 		);
 	}
 

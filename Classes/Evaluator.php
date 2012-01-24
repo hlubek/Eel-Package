@@ -14,7 +14,9 @@ class Evaluator {
 
 	protected $t_singleQuotedStringLiteral = '\'([^\'\\\\]|\\\\\')*\'';
 
-	protected $t_notDesignator = '!';
+	protected $t_notDesignator = '(!|not\s+)';
+
+	protected $t_methodCallStart = '[a-zA-Z_]+';
 
 	protected $t_stringLiteral;
 
@@ -36,13 +38,15 @@ class Evaluator {
 
 	/**
 	 * The current value that was evaluated, maybe we need a stack later
-	 * @var mixed
+	 * @var array
 	 */
-	protected $value;
+	protected $valueStack;
 
 	public function __construct() {
 		$this->t_stringLiteral = $this->t_singleQuotedStringLiteral . '|' . $this->t_doubleQuotedStringLiteral;
 		$this->t_term = $this->t_floatLiteral . '|' . $this->t_integerLiteral . '|' . $this->t_stringLiteral;
+
+		$this->valueStack = array();
 	}
 
 	/**
