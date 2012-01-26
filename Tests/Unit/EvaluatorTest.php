@@ -154,8 +154,7 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param mixed $result
 	 */
 	public function integerLiteralsCanBeParsed($expression, $context, $result) {
-		$evaluator = new Evaluator();
-		$this->assertSame($result, $evaluator->evaluate($expression, $context));
+		$this->assertEvaluated($result, $expression, $context);
 	}
 
 	/**
@@ -167,8 +166,7 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param mixed $result
 	 */
 	public function floatLiteralsCanBeParsed($expression, $context, $result) {
-		$evaluator = new Evaluator();
-		$this->assertSame($result, $evaluator->evaluate($expression, $context));
+		$this->assertEvaluated($result, $expression, $context);
 	}
 
 	/**
@@ -180,8 +178,7 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param mixed $result
 	 */
 	public function stringLiteralsCanBeParsed($expression, $context, $result) {
-		$evaluator = new Evaluator();
-		$this->assertSame($result, $evaluator->evaluate($expression, $context));
+		$this->assertEvaluated($result, $expression, $context);
 	}
 
 	/**
@@ -193,8 +190,7 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param mixed $result
 	 */
 	public function notExpressionsCanBeParsed($expression, $context, $result) {
-		$evaluator = new Evaluator();
-		$this->assertSame($result, $evaluator->evaluate($expression, $context));
+		$this->assertEvaluated($result, $expression, $context);
 	}
 
 	/**
@@ -206,8 +202,7 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param mixed $result
 	 */
 	public function comparisonExpressionsCanBeParsed($expression, $context, $result) {
-		$evaluator = new Evaluator();
-		$this->assertSame($result, $evaluator->evaluate($expression, $context));
+		$this->assertEvaluated($result, $expression, $context);
 	}
 
 	/**
@@ -219,8 +214,7 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param mixed $result
 	 */
 	public function calculationExpressionsCanBeParsed($expression, $context, $result) {
-		$evaluator = new Evaluator();
-		$this->assertSame($result, $evaluator->evaluate($expression, $context));
+		$this->assertEvaluated($result, $expression, $context);
 	}
 
 	/**
@@ -232,8 +226,20 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param mixed $result
 	 */
 	public function combinedExpressionsCanBeParsed($expression, $context, $result) {
+		$this->assertEvaluated($result, $expression, $context);
+	}
+
+	/**
+	 * Assert that the expression is evaluated to the expected result
+	 * under the given context.
+	 *
+	 * @param mixed $expected
+	 * @param string $expression
+	 * @param \Eel\Context $context
+	 */
+	protected function assertEvaluated($expected, $expression, $context) {
 		$evaluator = new Evaluator();
-		$this->assertSame($result, $evaluator->evaluate($expression, $context));
+		$this->assertSame($expected, $evaluator->evaluate($expression, $context));
 	}
 
 }
