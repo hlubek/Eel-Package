@@ -5,6 +5,20 @@ require_once __DIR__ . '/../Resources/Private/PHP/php-peg/Parser.php';
 
 class EelParser extends \Parser {
 
+	/**
+	 * @var \Eel\Context
+	 */
+	protected $context;
+
+	/**
+	 * @param string $string
+	 * @param \Eel\Context $context
+	 */
+	function __construct($string, $context) {
+		parent::__construct($string);
+		$this->context = $context;
+	}
+
 /*!* BasicTypes
 
 _IntegerNumber: / -? [0-9]+ /
@@ -28,11 +42,40 @@ StringLiteral: SingleQuotedStringLiteral | DoubleQuotedStringLiteral
 		$result['val'] = (string)str_replace('\"', '"', substr($sub['text'], 1, -1));
 	}
 
-Identifier: /[a-zA-Z0-9]+/
-ObjectName: Identifier
-MethodIdentifier: Identifier
+Identifier: / [a-zA-Z_] [a-zA-Z0-9_]* /
+OffsetAccess: '[' < Expression > ']'
+	function Expression(&$result, $sub) {
+		$result['index'] = $sub['val'];
+	}
+MethodCall: Identifier '(' < Expression* > ')'
+	function Identifier(&$result, $sub) {
+		$result['method'] = $sub['text'];
+	}
+	function Expression(&$result, $sub) {
+		$result['arguments'][] = $sub['val'];
+	}
 
-Term: NumberLiteral | StringLiteral
+ObjectPath: Identifier ('.' (MethodCall | Identifier) | OffsetAccess)*
+	function Identifier(&$result, $sub) {
+		$path = $sub['text'];
+		if (!array_key_exists('val', $result)) {
+			$result['val'] = $this->context;
+		}
+		$result['val'] = $result['val']->getAndWrap($path);
+	}
+	function OffsetAccess(&$result, $sub) {
+		$path = $sub['index'];
+		$result['val'] = $result['val']->getAndWrap($path);
+	}
+	function MethodCall(&$result, $sub) {
+		$arguments = isset($sub['arguments']) ? $sub['arguments'] : array();
+		$result['val'] = $result['val']->callAndWrap($sub['method'], $arguments);
+	}
+
+Term: ObjectPath | NumberLiteral | StringLiteral
+	function ObjectPath(&$result, $sub) {
+		$result['val'] = $sub['val'];
+	}
 	function NumberLiteral(&$result, $sub) {
 		$result['val'] = $sub['val'];
 	}

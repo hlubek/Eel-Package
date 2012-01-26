@@ -15,12 +15,15 @@ class Evaluator {
 	 * @return mixed
 	 */
 	public function evaluate($expression, Context $context) {
-		$parser = new EelParser($expression);
+		$parser = new EelParser($expression, $context);
 		$res = $parser->match_Expression();
-		if (!isset($res['val'])) {
+		if (!array_key_exists('val', $res)) {
 			throw new \Exception('No value in result: ' . json_encode($res));
+		} else if ($res['val'] instanceof Context) {
+			return $res['val']->unwrap();
+		} else {
+			return $res['val'];
 		}
-		return $res['val'];
 	}
 
 }

@@ -9,28 +9,6 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	/**
 	 * @return array
 	 */
-	public function objectPathExpressions() {
-		$data = array(
-			'foo' => array(
-				'bar' => array(
-					'baz' => 42
-				)
-			)
-		);
-		$c = new Context($data);
-		return array(
-			// The most simple object path
-			array('foo', $c, $data['foo']),
-			// A nested path
-			array('foo.bar', $c, $data['foo']['bar']),
-			// A more deeply nested path
-			array('foo.bar.baz', $c, $data['foo']['bar']['baz']),
-		);
-	}
-
-	/**
-	 * @return array
-	 */
 	public function integerLiterals() {
 		$c = new Context();
 		return array(
@@ -146,6 +124,60 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	}
 
 	/**
+	 * @return array
+	 */
+	public function objectPathOnArrayExpressions() {
+		// Wrap a value inside a context
+		$c = new Context(array(
+			'foo' => 42,
+			'bar' => array(
+				'baz' => 'Hello',
+				'a1' => array(
+					'b2' => 'Nested'
+				)
+			),
+			'another' => array(
+				'path' => 'b2'
+			)
+		));
+		return array(
+			// Undefined variables are NULL with the default context
+			array('unknwn', $c, NULL),
+			// Simple variable statement
+			array('foo', $c, 42),
+			// Simple object path
+			array('bar.baz', $c, 'Hello'),
+			// Dynamic array like access of properties by another object path (awesome!!!)
+			array('bar.a1[another.path]', $c, 'Nested'),
+			// Offset access with invalid path is NULL
+			array('bar.a1[unknwn.path]', $c, NULL),
+		);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function objectPathOnObjectExpressions() {
+		$obj = new Fixtures\TestObject();
+		$obj->setProperty('Test');
+		$nested = new Fixtures\TestObject();
+		$nested->setProperty($obj);
+		// Wrap an object inside a context
+		$c = new Context(array(
+			'obj' => $obj,
+			'nested' => $nested
+		));
+		return array(
+			// Access object properties by getter
+			array('obj.property', $c, 'Test'),
+			// Access nested objects
+			array('nested.property.property', $c, 'Test'),
+			// Call a method on an object
+			array('obj.callMe("Foo")', $c, 'Hello, Foo!'),
+		);
+	}
+
+	/**
 	 * @test
 	 * @dataProvider integerLiterals
 	 *
@@ -226,6 +258,30 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param mixed $result
 	 */
 	public function combinedExpressionsCanBeParsed($expression, $context, $result) {
+		$this->assertEvaluated($result, $expression, $context);
+	}
+
+	/**
+	 * @test
+	 * @dataProvider objectPathOnArrayExpressions
+	 *
+	 * @param string $expression
+	 * @param \Eel\Context $context
+	 * @param mixed $result
+	 */
+	public function objectPathOnArrayExpressionsCanBeParsed($expression, $context, $result) {
+		$this->assertEvaluated($result, $expression, $context);
+	}
+
+	/**
+	 * @test
+	 * @dataProvider objectPathOnObjectExpressions
+	 *
+	 * @param string $expression
+	 * @param \Eel\Context $context
+	 * @param mixed $result
+	 */
+	public function objectPathOnObjectExpressionsCanBeParsed($expression, $context, $result) {
 		$this->assertEvaluated($result, $expression, $context);
 	}
 
