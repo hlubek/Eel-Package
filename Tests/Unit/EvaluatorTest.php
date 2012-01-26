@@ -178,6 +178,30 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	}
 
 	/**
+	 * @return array
+	 */
+	public function methodCallExpressions() {
+		// Wrap an array with functions inside a context
+		$c = new Context(array(
+			'count' => function($array) {
+				return count($array);
+			},
+			'funcs' => array(
+				'dup' => function($array) {
+					return array_map(function($item) { return $item * 2; }, $array);
+				}
+			),
+			'arr' => array('a' => 1, 'b' => 2, 'c' => 3)
+		));
+		return array(
+			// Call first-level method
+			array('count(arr)', $c, 3),
+			// Nest method calls and object paths
+			array('funcs.dup(arr).b', $c, 4),
+		);
+	}
+
+	/**
 	 * @test
 	 * @dataProvider integerLiterals
 	 *
@@ -282,6 +306,18 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param mixed $result
 	 */
 	public function objectPathOnObjectExpressionsCanBeParsed($expression, $context, $result) {
+		$this->assertEvaluated($result, $expression, $context);
+	}
+
+	/**
+	 * @test
+	 * @dataProvider methodCallExpressions
+	 *
+	 * @param string $expression
+	 * @param \Eel\Context $context
+	 * @param mixed $result
+	 */
+	public function methodCallExpressionsCanBeParsed($expression, $context, $result) {
 		$this->assertEvaluated($result, $expression, $context);
 	}
 

@@ -44,11 +44,28 @@ class Context {
 	 * @param array $arguments
 	 */
 	public function call($method, $arguments = array()) {
-		if (!method_exists($this->value, $method)) {
-			// TODO Better general error handling
+		for ($i = 0; $i < count($arguments); $i++) {
+			if ($arguments[$i] instanceof Context) {
+				$arguments[$i] = $arguments[$i]->unwrap();
+			}
+		}
+		if (is_object($this->value)) {
+			$callback = array($this->value, $method);
+		} elseif (is_array($this->value)) {
+			if (!array_key_exists($method, $this->value)) {
+				// TODO Return NULL or throw Exception?
+				return NULL;
+			}
+			$callback = $this->value[$method];
+		} else {
+			// TODO Better general error handling (return NULL?)
+			throw new \Exception('Needs object or array to call method');
+		}
+		if (!is_callable($callback)) {
+			// TODO Better general error handling (return NULL?)
 			throw new \Exception('Method "' . $method . '" does not exist');
 		}
-		return call_user_func_array(array($this->value, $method), $arguments);
+		return call_user_func_array($callback, $arguments);
 	}
 
 	public function callAndWrap($method, $arguments = array()) {

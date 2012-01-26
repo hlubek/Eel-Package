@@ -55,7 +55,7 @@ MethodCall: Identifier '(' < Expression* > ')'
 		$result['arguments'][] = $sub['val'];
 	}
 
-ObjectPath: Identifier ('.' (MethodCall | Identifier) | OffsetAccess)*
+ObjectPath: (MethodCall | Identifier) ('.' (MethodCall | Identifier) | OffsetAccess)*
 	function Identifier(&$result, $sub) {
 		$path = $sub['text'];
 		if (!array_key_exists('val', $result)) {
@@ -69,6 +69,9 @@ ObjectPath: Identifier ('.' (MethodCall | Identifier) | OffsetAccess)*
 	}
 	function MethodCall(&$result, $sub) {
 		$arguments = isset($sub['arguments']) ? $sub['arguments'] : array();
+		if (!array_key_exists('val', $result)) {
+			$result['val'] = $this->context;
+		}
 		$result['val'] = $result['val']->callAndWrap($sub['method'], $arguments);
 	}
 
