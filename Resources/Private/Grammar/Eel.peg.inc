@@ -88,7 +88,11 @@ Term: ObjectPath | NumberLiteral | StringLiteral
 */
 
 /*!* CombinedExpressions
-Expression: (WrappedExpression | NotExpression | Term) > (Comparison | Calculation)?
+Expression: Comparison
+	function Comparison(&$result, $sub) {
+		$result['val'] = $sub['val'];
+	}
+SimpleExpression: WrappedExpression | NotExpression | Term
 	function WrappedExpression(&$result, $sub) {
 		$result['val'] = $sub['val'];
 	}
@@ -98,49 +102,6 @@ Expression: (WrappedExpression | NotExpression | Term) > (Comparison | Calculati
 	function Term(&$result, $sub) {
 		$result['val'] = $sub['val'];
 	}
-	function Calculation(&$result, $sub) {
-		$lval = $result['val'];
-		$rval = $sub['rval'];
-		switch ($sub['op']) {
-		case '+':
-			$result['val'] = ($lval + $rval);
-			break;
-		case '-':
-			$result['val'] = ($lval - $rval);
-			break;
-		case '/':
-			$result['val'] = ($lval / $rval);
-			break;
-		case '*':
-			$result['val'] = ($lval * $rval);
-			break;
-		case '%':
-			$result['val'] = ($lval % $rval);
-			break;
-		}
-	}
-	function Comparison(&$result, $sub) {
-		// Take the computed value (left side)
-		$lval = $result['val'];
-		$rval = $sub['rval'];
-		switch ($sub['comp']) {
-		case '==':
-			$result['val'] = ($lval === $rval);
-			break;
-		case '<':
-			$result['val'] = ($lval < $rval);
-			break;
-		case '<=':
-			$result['val'] = ($lval <= $rval);
-			break;
-		case '>':
-			$result['val'] = ($lval > $rval);
-			break;
-		case '>=':
-			$result['val'] = ($lval >= $rval);
-			break;
-		}
-	}
 WrappedExpression: '(' > Expression > ')'
 	function Expression(&$result, $sub) {
 		$result['val'] = $sub['val'];
@@ -149,15 +110,59 @@ NotExpression: (/ ! | not\s+ /) > Expression
 	function Expression(&$result, $sub) {
 		$result['val'] = !(boolean)$sub['val'];
 	}
-Comparison: comp:/ == | <= | >= | < | > / > exp:Expression
-	function __finalise(&$self) {
-		$self['comp'] = $self['comp']['text'];
-		$self['rval'] = $self['exp']['val'];
+Comparison: lft:Calculation (< comp:/ == | <= | >= | < | > / > rgt:Calculation)?
+	function lft(&$result, $sub) {
+		$result['val'] = $sub['val'];
 	}
-Calculation: op:/ \+ | \- | \/ | \* | % / > exp:Expression
-	function __finalise(&$self) {
-		$self['op'] = $self['op']['text'];
-		$self['rval'] = $self['exp']['val'];
+	function comp(&$result, $sub) {
+		$result['comp'] = $sub['text'];
+	}
+	function rgt(&$result, $sub) {
+		$rval = $sub['val'];
+		switch ($result['comp']) {
+		case '==':
+			$result['val'] = $result['val'] === $rval;
+			break;
+		case '<':
+			$result['val'] = $result['val'] < $rval;
+			break;
+		case '<=':
+			$result['val'] = $result['val'] <= $rval;
+			break;
+		case '>':
+			$result['val'] = $result['val'] > $rval;
+			break;
+		case '>=':
+			$result['val'] = $result['val'] >= $rval;
+			break;
+		}
+	}
+Calculation: lft:SimpleExpression (< op:/ \+ | \- | \/ | \* | % / > rgt:SimpleExpression)?
+	function lft(&$result, $sub) {
+		$result['val'] = $sub['val'];
+	}
+	function op(&$result, $sub) {
+		$result['op'] = $sub['text'];
+	}
+	function rgt(&$result, $sub) {
+		$rval = $sub['val'];
+		switch ($result['op']) {
+		case '+':
+			$result['val'] += $rval;
+			break;
+		case '-':
+			$result['val'] -= $rval;
+			break;
+		case '/':
+			$result['val'] = $result['val'] / $rval;
+			break;
+		case '*':
+			$result['val'] *= $rval;
+			break;
+		case '%':
+			$result['val'] = $result['val'] % $rval;
+			break;
+		}
 	}
 */
 }

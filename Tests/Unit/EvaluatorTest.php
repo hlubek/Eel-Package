@@ -116,9 +116,11 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	public function combinedExpressions() {
 		$c = new Context();
 		return array(
-			// We need to paren this
-			array('(1 + 2) > 3', $c, FALSE),
-			// But comparison on left side works because of left parsing order
+			// Calculations before comparisons
+			array('1 + 2 > 3', $c, FALSE),
+			// Calculations before comparisons
+			array('2 * 1 == 3 - 1', $c, TRUE),
+			// Comparison on left side work too
 			array('1 < 1 + 1', $c, TRUE),
 		);
 	}
