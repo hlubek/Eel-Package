@@ -42,6 +42,11 @@ StringLiteral: SingleQuotedStringLiteral | DoubleQuotedStringLiteral
 		$result['val'] = (string)str_replace('\"', '"', substr($sub['text'], 1, -1));
 	}
 
+BooleanLiteral: 'true' | 'TRUE' | 'false' | 'FALSE'
+	function __finalise(&$result) {
+		$result['val'] = strtolower($result['text']) === 'true';
+	}
+
 Identifier: / [a-zA-Z_] [a-zA-Z0-9_]* /
 OffsetAccess: '[' < Expression > ']'
 	function Expression(&$result, $sub) {
@@ -75,31 +80,19 @@ ObjectPath: (MethodCall | Identifier) ('.' (MethodCall | Identifier) | OffsetAcc
 		$result['val'] = $result['val']->callAndWrap($sub['method'], $arguments);
 	}
 
-Term: ObjectPath | NumberLiteral | StringLiteral
-	function ObjectPath(&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
-	function NumberLiteral(&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
-	function StringLiteral(&$result, $sub) {
+Term: term:BooleanLiteral | term:NumberLiteral | term:StringLiteral | term:ObjectPath
+	function term(&$result, $sub) {
 		$result['val'] = $sub['val'];
 	}
 */
 
 /*!* CombinedExpressions
-Expression: Comparison
-	function Comparison(&$result, $sub) {
+Expression: Disjunction
+	function Disjunction(&$result, $sub) {
 		$result['val'] = $sub['val'];
 	}
-SimpleExpression: WrappedExpression | NotExpression | Term
-	function WrappedExpression(&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
-	function NotExpression(&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
-	function Term(&$result, $sub) {
+SimpleExpression: term:WrappedExpression | term:NotExpression | term:Term
+	function term(&$result, $sub) {
 		$result['val'] = $sub['val'];
 	}
 WrappedExpression: '(' > Expression > ')'
@@ -110,7 +103,21 @@ NotExpression: (/ ! | not\s+ /) > Expression
 	function Expression(&$result, $sub) {
 		$result['val'] = !(boolean)$sub['val'];
 	}
-Comparison: lft:Calculation (< comp:/ == | <= | >= | < | > / > rgt:Calculation)?
+Disjunction: lft:Conjunction (< / \|\| | or\s+ / > rgt:Conjunction)*
+	function lft(&$result, $sub) {
+		$result['val'] = $sub['val'];
+	}
+	function rgt(&$result, $sub) {
+		$result['val'] = $result['val'] || (boolean)$sub['val'];
+	}
+Conjunction: lft:Comparison (< / && | and\s+ / > rgt:Comparison)*
+	function lft(&$result, $sub) {
+		$result['val'] = $sub['val'];
+	}
+	function rgt(&$result, $sub) {
+		$result['val'] = $result['val'] && (boolean)$sub['val'];
+	}
+Comparison: lft:SumCalculation (< comp:/ == | <= | >= | < | > / > rgt:SumCalculation)?
 	function lft(&$result, $sub) {
 		$result['val'] = $sub['val'];
 	}
@@ -137,7 +144,7 @@ Comparison: lft:Calculation (< comp:/ == | <= | >= | < | > / > rgt:Calculation)?
 			break;
 		}
 	}
-Calculation: lft:SimpleExpression (< op:/ \+ | \- | \/ | \* | % / > rgt:SimpleExpression)?
+SumCalculation: lft:ProdCalculation (< op:/ \+ | \- / > rgt:ProdCalculation)*
 	function lft(&$result, $sub) {
 		$result['val'] = $sub['val'];
 	}
@@ -153,6 +160,18 @@ Calculation: lft:SimpleExpression (< op:/ \+ | \- | \/ | \* | % / > rgt:SimpleEx
 		case '-':
 			$result['val'] -= $rval;
 			break;
+		}
+	}
+ProdCalculation: lft:SimpleExpression (< op:/ \/ | \* | % / > rgt:SimpleExpression)*
+	function lft(&$result, $sub) {
+		$result['val'] = $sub['val'];
+	}
+	function op(&$result, $sub) {
+		$result['op'] = $sub['text'];
+	}
+	function rgt(&$result, $sub) {
+		$rval = $sub['val'];
+		switch ($result['op']) {
 		case '/':
 			$result['val'] = $result['val'] / $rval;
 			break;

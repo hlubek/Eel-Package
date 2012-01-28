@@ -107,6 +107,10 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 			array('1 + 1', $c, 2),
 			array('1 - 1', $c, 0),
 			array('2*2', $c, 4),
+			// Multiple calc with precedence
+			array('1 + 2 * 3 + 4 / 2 + 2', $c, 11),
+			//
+			array('(1 + 2) * 3 + 4 / (2 + 2)', $c, 10),
 		);
 	}
 
@@ -122,6 +126,25 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 			array('2 * 1 == 3 - 1', $c, TRUE),
 			// Comparison on left side work too
 			array('1 < 1 + 1', $c, TRUE),
+		);
+	}
+
+	/**
+	 * @return array
+	 */
+	public function booleanExpressions() {
+		$c = new Context();
+		return array(
+			// Boolean literals work
+			array('false', $c, FALSE),
+			array('TRUE', $c, TRUE),
+			// Conjunction before Disjunction
+			array('TRUE && TRUE || FALSE && FALSE', $c, TRUE),
+			array('TRUE && FALSE || FALSE && TRUE', $c, FALSE),
+			array('1 < 2 && 2 > 1', $c, TRUE),
+			array('!1 < 2', $c, FALSE),
+			// Named and symbolic operators can be mixed
+			array('TRUE && true and FALSE or false', $c, FALSE),
 		);
 	}
 
@@ -320,6 +343,18 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param mixed $result
 	 */
 	public function methodCallExpressionsCanBeParsed($expression, $context, $result) {
+		$this->assertEvaluated($result, $expression, $context);
+	}
+
+	/**
+	 * @test
+	 * @dataProvider booleanExpressions
+	 *
+	 * @param string $expression
+	 * @param \Eel\Context $context
+	 * @param mixed $result
+	 */
+	public function booleanExpressionsCanBeParsed($expression, $context, $result) {
 		$this->assertEvaluated($result, $expression, $context);
 	}
 
