@@ -4,7 +4,7 @@ namespace Eel\Tests\Unit;
 use Eel\Context;
 use Eel\Evaluator;
 
-class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
+abstract class AbstractEvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 
 	/**
 	 * @return array
@@ -367,9 +367,14 @@ class EvaluatorTest extends \TYPO3\FLOW3\Tests\UnitTestCase {
 	 * @param \Eel\Context $context
 	 */
 	protected function assertEvaluated($expected, $expression, $context) {
-		$evaluator = new Evaluator();
+		$evaluator = $this->createEvaluator();
 		$this->assertSame($expected, $evaluator->evaluate($expression, $context));
 	}
+
+	/**
+	 * @return \Eel\Context
+	 */
+	abstract protected function createEvaluator();
 
 }
 ?>

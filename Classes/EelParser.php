@@ -5,20 +5,6 @@ require_once __DIR__ . '/../Resources/Private/PHP/php-peg/Parser.php';
 
 class EelParser extends \Parser {
 
-	/**
-	 * @var \Eel\Context
-	 */
-	protected $context;
-
-	/**
-	 * @param string $string
-	 * @param \Eel\Context $context
-	 */
-	function __construct($string, $context) {
-		parent::__construct($string);
-		$this->context = $context;
-	}
-
 /* _IntegerNumber: / -? [0-9]+ / */
 protected $match__IntegerNumber_typestack = array('_IntegerNumber');
 function match__IntegerNumber ($stack = array()) {
@@ -75,13 +61,6 @@ function match_NumberLiteral ($stack = array()) {
 	if( $_4 === FALSE) { return FALSE; }
 }
 
-function NumberLiteral__finalise (&$self) {
-		if (isset($self['dec'])) {
-			$self['val'] = (float)($self['text']);
-		} else {
-			$self['val'] = (integer)$self['text'];
-		}
-	}
 
 /* DoubleQuotedStringLiteral: '"' / (\\"|[^"])* / '"' */
 protected $match_DoubleQuotedStringLiteral_typestack = array('DoubleQuotedStringLiteral');
@@ -166,13 +145,6 @@ function match_StringLiteral ($stack = array()) {
 	if( $_19 === FALSE) { return FALSE; }
 }
 
-function StringLiteral_SingleQuotedStringLiteral (&$result, $sub) {
-		$result['val'] = (string)str_replace("\'", "'", substr($sub['text'], 1, -1));
-	}
-
-function StringLiteral_DoubleQuotedStringLiteral (&$result, $sub) {
-		$result['val'] = (string)str_replace('\"', '"', substr($sub['text'], 1, -1));
-	}
 
 /* BooleanLiteral: 'true' | 'TRUE' | 'false' | 'FALSE' */
 protected $match_BooleanLiteral_typestack = array('BooleanLiteral');
@@ -233,9 +205,6 @@ function match_BooleanLiteral ($stack = array()) {
 	if( $_32 === FALSE) { return FALSE; }
 }
 
-function BooleanLiteral__finalise (&$result) {
-		$result['val'] = strtolower($result['text']) === 'true';
-	}
 
 /* Identifier: / [a-zA-Z_] [a-zA-Z0-9_]* / */
 protected $match_Identifier_typestack = array('Identifier');
@@ -278,9 +247,6 @@ function match_OffsetAccess ($stack = array()) {
 	if( $_40 === FALSE) { return FALSE; }
 }
 
-function OffsetAccess_Expression (&$result, $sub) {
-		$result['index'] = $sub['val'];
-	}
 
 /* MethodCall: Identifier '(' < Expression* > ')' */
 protected $match_MethodCall_typestack = array('MethodCall');
@@ -325,13 +291,6 @@ function match_MethodCall ($stack = array()) {
 	if( $_48 === FALSE) { return FALSE; }
 }
 
-function MethodCall_Identifier (&$result, $sub) {
-		$result['method'] = $sub['text'];
-	}
-
-function MethodCall_Expression (&$result, $sub) {
-		$result['arguments'][] = $sub['val'];
-	}
 
 /* ObjectPath: (MethodCall | Identifier) ('.' (MethodCall | Identifier) | OffsetAccess)* */
 protected $match_ObjectPath_typestack = array('ObjectPath');
@@ -451,26 +410,6 @@ function match_ObjectPath ($stack = array()) {
 	if( $_73 === FALSE) { return FALSE; }
 }
 
-function ObjectPath_Identifier (&$result, $sub) {
-		$path = $sub['text'];
-		if (!array_key_exists('val', $result)) {
-			$result['val'] = $this->context;
-		}
-		$result['val'] = $result['val']->getAndWrap($path);
-	}
-
-function ObjectPath_OffsetAccess (&$result, $sub) {
-		$path = $sub['index'];
-		$result['val'] = $result['val']->getAndWrap($path);
-	}
-
-function ObjectPath_MethodCall (&$result, $sub) {
-		$arguments = isset($sub['arguments']) ? $sub['arguments'] : array();
-		if (!array_key_exists('val', $result)) {
-			$result['val'] = $this->context;
-		}
-		$result['val'] = $result['val']->callAndWrap($sub['method'], $arguments);
-	}
 
 /* Term: term:BooleanLiteral | term:NumberLiteral | term:StringLiteral | term:ObjectPath */
 protected $match_Term_typestack = array('Term');
@@ -539,9 +478,6 @@ function match_Term ($stack = array()) {
 	if( $_86 === FALSE) { return FALSE; }
 }
 
-function Term_term (&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
 
 
 
@@ -558,9 +494,6 @@ function match_Expression ($stack = array()) {
 	else { return FALSE; }
 }
 
-function Expression_Disjunction (&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
 
 /* SimpleExpression: term:WrappedExpression | term:NotExpression | term:Term */
 protected $match_SimpleExpression_typestack = array('SimpleExpression');
@@ -611,9 +544,6 @@ function match_SimpleExpression ($stack = array()) {
 	if( $_96 === FALSE) { return FALSE; }
 }
 
-function SimpleExpression_term (&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
 
 /* WrappedExpression: '(' > Expression > ')' */
 protected $match_WrappedExpression_typestack = array('WrappedExpression');
@@ -644,9 +574,6 @@ function match_WrappedExpression ($stack = array()) {
 	if( $_103 === FALSE) { return FALSE; }
 }
 
-function WrappedExpression_Expression (&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
 
 /* NotExpression: (/ ! | not\s+ /) > Expression */
 protected $match_NotExpression_typestack = array('NotExpression');
@@ -674,9 +601,6 @@ function match_NotExpression ($stack = array()) {
 	if( $_110 === FALSE) { return FALSE; }
 }
 
-function NotExpression_Expression (&$result, $sub) {
-		$result['val'] = !(boolean)$sub['val'];
-	}
 
 /* Disjunction: lft:Conjunction (< / \|\| | or\s+ / > rgt:Conjunction)* */
 protected $match_Disjunction_typestack = array('Disjunction');
@@ -723,13 +647,6 @@ function match_Disjunction ($stack = array()) {
 	if( $_119 === FALSE) { return FALSE; }
 }
 
-function Disjunction_lft (&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
-
-function Disjunction_rgt (&$result, $sub) {
-		$result['val'] = $result['val'] || (boolean)$sub['val'];
-	}
 
 /* Conjunction: lft:Comparison (< / && | and\s+ / > rgt:Comparison)* */
 protected $match_Conjunction_typestack = array('Conjunction');
@@ -776,13 +693,6 @@ function match_Conjunction ($stack = array()) {
 	if( $_128 === FALSE) { return FALSE; }
 }
 
-function Conjunction_lft (&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
-
-function Conjunction_rgt (&$result, $sub) {
-		$result['val'] = $result['val'] && (boolean)$sub['val'];
-	}
 
 /* Comparison: lft:SumCalculation (< comp:/ == | <= | >= | < | > / > rgt:SumCalculation)? */
 protected $match_Comparison_typestack = array('Comparison');
@@ -834,34 +744,6 @@ function match_Comparison ($stack = array()) {
 	if( $_137 === FALSE) { return FALSE; }
 }
 
-function Comparison_lft (&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
-
-function Comparison_comp (&$result, $sub) {
-		$result['comp'] = $sub['text'];
-	}
-
-function Comparison_rgt (&$result, $sub) {
-		$rval = $sub['val'];
-		switch ($result['comp']) {
-		case '==':
-			$result['val'] = $result['val'] === $rval;
-			break;
-		case '<':
-			$result['val'] = $result['val'] < $rval;
-			break;
-		case '<=':
-			$result['val'] = $result['val'] <= $rval;
-			break;
-		case '>':
-			$result['val'] = $result['val'] > $rval;
-			break;
-		case '>=':
-			$result['val'] = $result['val'] >= $rval;
-			break;
-		}
-	}
 
 /* SumCalculation: lft:ProdCalculation (< op:/ \+ | \- / > rgt:ProdCalculation)* */
 protected $match_SumCalculation_typestack = array('SumCalculation');
@@ -916,25 +798,6 @@ function match_SumCalculation ($stack = array()) {
 	if( $_146 === FALSE) { return FALSE; }
 }
 
-function SumCalculation_lft (&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
-
-function SumCalculation_op (&$result, $sub) {
-		$result['op'] = $sub['text'];
-	}
-
-function SumCalculation_rgt (&$result, $sub) {
-		$rval = $sub['val'];
-		switch ($result['op']) {
-		case '+':
-			$result['val'] += $rval;
-			break;
-		case '-':
-			$result['val'] -= $rval;
-			break;
-		}
-	}
 
 /* ProdCalculation: lft:SimpleExpression (< op:/ \/ | \* | % / > rgt:SimpleExpression)* */
 protected $match_ProdCalculation_typestack = array('ProdCalculation');
@@ -989,28 +852,7 @@ function match_ProdCalculation ($stack = array()) {
 	if( $_155 === FALSE) { return FALSE; }
 }
 
-function ProdCalculation_lft (&$result, $sub) {
-		$result['val'] = $sub['val'];
-	}
 
-function ProdCalculation_op (&$result, $sub) {
-		$result['op'] = $sub['text'];
-	}
-
-function ProdCalculation_rgt (&$result, $sub) {
-		$rval = $sub['val'];
-		switch ($result['op']) {
-		case '/':
-			$result['val'] = $result['val'] / $rval;
-			break;
-		case '*':
-			$result['val'] *= $rval;
-			break;
-		case '%':
-			$result['val'] = $result['val'] % $rval;
-			break;
-		}
-	}
 
 
 }
